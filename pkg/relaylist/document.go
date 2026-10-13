@@ -110,8 +110,9 @@ type endpointJSON struct {
 //
 // It refuses, before encoding anything, a document no client should ever receive: a version
 // below 1; expires_at not after generated_at; no API endpoint, or an invalid one; no relay;
-// and a relay that cannot be published -- no WireGuard public key, no IPv4 address or no
-// endpoint; a status outside {active, draining}; an ownership outside {owned, rented}; or an
+// and a relay that cannot be published -- no node_id, no WireGuard public key, no IPv4
+// address or no endpoint; a status outside {active, draining}; an ownership outside {owned,
+// rented}; a capacity_weight outside 0..100; or an
 // endpoint whose kind is not transport.Kind.Valid, whose port is outside 1..65535, or whose
 // (kind, port) repeats an earlier one. A relay refusal is a carrier type naming that relay's
 // node_id and nothing else, wrapping its sentinel. Every refusal returns nil bytes.
@@ -162,7 +163,7 @@ func (d Document) Encode() ([]byte, error) {
 
 // wire converts a relay to its wire form, or refuses an incomplete one.
 func (r Relay) wire() (relayJSON, error) {
-	if r.wgPublicKey == "" || !r.ipv4.IsValid() || len(r.endpoints) == 0 {
+	if r.nodeID == "" || r.wgPublicKey == "" || !r.ipv4.IsValid() || len(r.endpoints) == 0 {
 		return relayJSON{}, &RelayIncompleteError{nodeID: r.nodeID}
 	}
 	if !r.status.Valid() {
@@ -170,6 +171,9 @@ func (r Relay) wire() (relayJSON, error) {
 	}
 	if !r.ownership.Valid() {
 		return relayJSON{}, &OwnershipUnknownError{nodeID: r.nodeID}
+	}
+	if r.capacityWeight < 0 || r.capacityWeight > 100 {
+		return relayJSON{}, &CapacityWeightOutOfRangeError{nodeID: r.nodeID}
 	}
 
 	var ipv6 *string

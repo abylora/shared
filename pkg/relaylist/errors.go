@@ -32,8 +32,8 @@ var (
 	// of the same unservable artifact.
 	ErrNoRelays = errors.New("relaylist: no relay")
 
-	// ErrRelayIncomplete: a relay with no WireGuard public key, no IPv4 address or no
-	// endpoint is one every client would fail to reach. This is what stops the encoder ever
+	// ErrRelayIncomplete: a relay with no node_id, no WireGuard public key, no IPv4 address
+	// or no endpoint is one every client would fail to reach or refer to. This is what stops the encoder ever
 	// writing "wg_public_key":"" whatever the caller let through. Always carried by a
 	// *RelayIncompleteError.
 	ErrRelayIncomplete = errors.New("relaylist: relay is incomplete")
@@ -62,6 +62,11 @@ var (
 	// ErrOwnershipUnknown: a relay whose ownership is neither owned nor rented. Always
 	// carried by an *OwnershipUnknownError.
 	ErrOwnershipUnknown = errors.New("relaylist: relay ownership is neither owned nor rented")
+
+	// ErrCapacityWeightOutOfRange: a relay capacity_weight outside 0..100 (contract, Shape).
+	// Above 100 skews every client's selection toward that node fleet-wide; 0 is legitimate
+	// and means "do not pick". Always carried by a *CapacityWeightOutOfRangeError.
+	ErrCapacityWeightOutOfRange = errors.New("relaylist: relay capacity_weight is outside 0..100")
 
 	// ErrEncodeFailed wraps a json.Marshal failure, which these types cannot produce.
 	ErrEncodeFailed = errors.New("relaylist: failed to encode the document")
@@ -158,6 +163,20 @@ func (e *OwnershipUnknownError) Unwrap() error { return ErrOwnershipUnknown }
 
 // NodeID returns the node whose relay has an unknown ownership.
 func (e *OwnershipUnknownError) NodeID() NodeID { return e.nodeID }
+
+// CapacityWeightOutOfRangeError names the node whose relay has a capacity_weight out of range.
+type CapacityWeightOutOfRangeError struct {
+	nodeID NodeID
+}
+
+func (e *CapacityWeightOutOfRangeError) Error() string {
+	return ErrCapacityWeightOutOfRange.Error() + ": node " + string(e.nodeID)
+}
+
+func (e *CapacityWeightOutOfRangeError) Unwrap() error { return ErrCapacityWeightOutOfRange }
+
+// NodeID returns the node whose relay has a capacity_weight out of range.
+func (e *CapacityWeightOutOfRangeError) NodeID() NodeID { return e.nodeID }
 
 // redacted is what every type in this package renders as through slog.LogValuer.
 const redacted = "REDACTED"
