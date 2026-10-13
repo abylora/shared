@@ -129,3 +129,34 @@ func TestEncodeRefusesAnOwnershipOutsideOwnedAndRented(t *testing.T) {
 		})
 	}
 }
+
+// capacity_weight is 0..100 (contract, Shape). Above 100 skews every client's selection
+// toward that node fleet-wide -- the same class of defect as an out-of-set status.
+func TestEncodeRefusesACapacityWeightOutsideZeroToHundred(t *testing.T) {
+	for _, weight := range []int{-1, 101} {
+		opts := firstRelayOpts()
+		opts.CapacityWeight = weight
+		requireRelayRefusal[*CapacityWeightOutOfRangeError](t, opts, ErrCapacityWeightOutOfRange)
+	}
+}
+
+// 0 is legitimate: it means "do not pick".
+func TestEncodeAcceptsTheBoundaryCapacityWeights(t *testing.T) {
+	for _, weight := range []int{0, 100} {
+		opts := firstRelayOpts()
+		opts.CapacityWeight = weight
+		doc := testDocumentOpts()
+		doc.Relays = []Relay{NewRelay(opts)}
+
+		if _, err := NewDocument(doc).Encode(); err != nil {
+			t.Errorf("Encode() for capacity_weight %d error = %v, want nil", weight, err)
+		}
+	}
+}
+
+// A relay with node_id "" cannot be referred to by any client, so it is incomplete.
+func TestEncodeRefusesAnEmptyNodeIDAsIncomplete(t *testing.T) {
+	opts := firstRelayOpts()
+	opts.NodeID = ""
+	requireRelayRefusal[*RelayIncompleteError](t, opts, ErrRelayIncomplete)
+}
