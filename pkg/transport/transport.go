@@ -10,6 +10,7 @@ package transport
 
 import (
 	"context"
+	"slices"
 	"time"
 )
 
@@ -29,6 +30,17 @@ const (
 	// from ordinary HTTPS.
 	KindQUIC Kind = "quic"
 )
+
+// kinds is the whole value set. A package-level var cloned by Kinds, so no caller can
+// rewrite the set for every other caller in the process.
+var kinds = []Kind{KindPlain, KindUDP2TCP, KindShadowsocks, KindQUIC}
+
+// Kinds returns every transport kind, as a copy. It is the one value set for the relay
+// list's endpoints[].kind; consumers drift-test their own enums against it.
+func Kinds() []Kind { return slices.Clone(kinds) }
+
+// Valid reports whether k is one of the transport kinds.
+func (k Kind) Valid() bool { return slices.Contains(kinds, k) }
 
 // Endpoint is one advertised way to reach a relay's WireGuard listener.
 // Relays announce their endpoints in the relay list; clients pick one.
