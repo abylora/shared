@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+// DocumentType is the relay list's statement type, written as the document's first field,
+// _type. The signing certificate carries a different _type, so an object signed by the wrong
+// key can never parse as the other kind (contract, The signing certificate). WIRE CONTRACT:
+// changing it breaks every deployed client.
+const DocumentType = "abylora.relay-list"
+
 // Document is one relay list: the contract's relay_list, minus the detached signature.
 //
 // THERE IS NO SIGNATURE FIELD. The contract's Shape lists "signature: detached signature over
@@ -65,8 +71,12 @@ func (Document) LogValue() slog.Value { return slog.StringValue(redacted) }
 
 // The wire structs. Unexported, so the JSON tags below are the ONLY place a field name is
 // spelled, and they are the contract's names in the contract's order. The order is for a
-// reader; under Reading A nothing depends on it being stable across versions.
+// reader; under Reading A nothing depends on it being stable across versions. That includes
+// _type: it is first by convention, for a reader; no verifier may depend on its position. A
+// decoder finds it by key. encoding/json writes fields in declaration order, so Type stays the
+// first field here, and the golden test keeps it first.
 type documentJSON struct {
+	Type         string            `json:"_type"`
 	Version      int64             `json:"version"`
 	GeneratedAt  string            `json:"generated_at"`
 	ExpiresAt    string            `json:"expires_at"`
@@ -131,6 +141,7 @@ func (d Document) Encode() ([]byte, error) {
 	}
 
 	wire := documentJSON{
+		Type:         DocumentType,
 		Version:      d.version,
 		GeneratedAt:  d.generatedAt.Format(time.RFC3339),
 		ExpiresAt:    d.expiresAt.Format(time.RFC3339),

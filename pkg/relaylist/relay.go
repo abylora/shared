@@ -15,9 +15,9 @@ type NodeID string
 type Status string
 
 const (
-	// StatusActive: clients may open new sessions here.
+	// StatusActive: clients may open new tunnels here.
 	StatusActive Status = "active"
-	// StatusDraining: do not open new sessions here. Existing sessions move when the client
+	// StatusDraining: do not open new tunnels here. Existing tunnels move when the client
 	// reconnects; there is no server-side migration.
 	StatusDraining Status = "draining"
 )
