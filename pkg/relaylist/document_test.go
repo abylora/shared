@@ -90,12 +90,13 @@ func testDocumentOpts() DocumentOpts {
 // contract's Shape. One line, compact, and NO TRAILING NEWLINE: what is encoded is what is
 // stored, signed and served, so a stray byte here would be a stray byte in every list.
 //
-// It pins every rule the encoding has: field names and nesting; ipv6 as null rather than
-// omitted ("string | null"); params as {} rather than null ("map[string]string"); RFC3339 in
-// UTC at whole seconds; no signature field (a detached signature cannot sit inside the octets
+// It pins every rule the encoding has: _type as the first field, carrying the statement type
+// "abylora.relay-list" (contract, The signing certificate); field names and nesting; ipv6 as
+// null rather than omitted ("string | null"); params as {} rather than null
+// ("map[string]string"); RFC3339 in UTC at whole seconds; no signature field (a detached signature cannot sit inside the octets
 // it signs); and endpoints[].kind as the data-plane kind string while transports[] is the
 // fetch enum.
-const goldenDocument = `{"version":42,"generated_at":"2026-10-10T12:00:00Z","expires_at":"2026-10-11T12:00:00Z",` +
+const goldenDocument = `{"_type":"abylora.relay-list","version":42,"generated_at":"2026-10-10T12:00:00Z","expires_at":"2026-10-11T12:00:00Z",` +
 	`"api_endpoints":[{"host":"192.0.2.1","port":443,"transports":["https"]},{"host":"2001:db8::1","port":443,"transports":["https"]}],` +
 	`"relays":[{"node_id":"3f0c6a51-0000-4000-8000-000000000001","hostname":"relay-1.test.example","ipv4":"192.0.2.10","ipv6":"2001:db8::10",` +
 	`"wg_public_key":"AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=","country":"ZZ","city":"Testville","capacity_weight":50,` +
@@ -105,6 +106,14 @@ const goldenDocument = `{"version":42,"generated_at":"2026-10-10T12:00:00Z","exp
 	`"wg_public_key":"AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=","country":"ZZ","city":"Testville","capacity_weight":0,` +
 	`"status":"draining","ownership":"rented","provider":"test-provider",` +
 	`"endpoints":[{"kind":"quic","port":443,"params":{}}]}]}`
+
+// The literal is written from the contract, not from DocumentType, so a renamed constant fails
+// here rather than silently changing the wire.
+func TestDocumentTypeIsTheContractStatementType(t *testing.T) {
+	if DocumentType != "abylora.relay-list" {
+		t.Errorf("DocumentType = %q, want %q", DocumentType, "abylora.relay-list")
+	}
+}
 
 func TestEncodeProducesTheGoldenBytes(t *testing.T) {
 	got, err := NewDocument(testDocumentOpts()).Encode()
