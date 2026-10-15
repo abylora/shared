@@ -24,14 +24,22 @@ var fields = []string{fieldType, fieldSpecVersion, fieldEnv, fieldRoot, fieldKey
 // client's decoder is a hole (contract, Strict parsing). It verifies no signature.
 //
 // It refuses, each with its own sentinel and in this order: anything that is not one JSON
-// object; a duplicate key at any depth; any byte after the object, whitespace included; an
-// unknown or a missing field; a _type other than Type; a spec_version other than the JSON
+// object; a duplicate key at any depth; any byte after the object, whitespace included;
+// insignificant whitespace anywhere else; a backslash anywhere; an unknown or a missing field; a _type other than Type; a spec_version other than the JSON
 // number 1; an env outside the two; a root that is not a fingerprint; a key that is not 64
-// lowercase hex characters; a timestamp not exactly YYYY-MM-DDTHH:MM:SSZ; and not_before not
-// before not_after.
+// lowercase hex characters; a key that is the root's own; a timestamp not exactly YYYY-MM-DDTHH:MM:SSZ; and not_before not
+// before not_after. Member order is free: no verifier depends on it.
 func Decode(octets []byte) (Certificate, error) {
 	if err := scan(octets); err != nil {
 		return Certificate{}, err
+	}
+	// After scan, so trailing whitespace stays ErrTrailingBytes, and a duplicate spelled
+	// with an escape stays ErrDuplicateKey: scan's unescaping comparison is belt and braces.
+	if !compact(octets) {
+		return Certificate{}, ErrWhitespace
+	}
+	if bytes.IndexByte(octets, '\\') >= 0 {
+		return Certificate{}, ErrEscape
 	}
 
 	// A map, not struct tags: encoding/json matches struct fields case-insensitively. scan
@@ -72,6 +80,9 @@ func Decode(octets []byte) (Certificate, error) {
 	if !ok {
 		return Certificate{}, ErrKeyMalformed
 	}
+	if Fingerprint(key[:]) == root {
+		return Certificate{}, ErrSelfCertificate
+	}
 
 	notBeforeText, _ := jsonString(raw[fieldNotBefore])
 	notBefore, ok := parseTimestamp(notBeforeText)
@@ -88,6 +99,25 @@ func Decode(octets []byte) (Certificate, error) {
 	}
 
 	return Certificate{env: Env(env), root: root, key: key, notBefore: notBefore, notAfter: notAfter}, nil
+}
+
+// compact reports whether octets, already known to be valid JSON, has no whitespace outside a
+// string. Inside a string whitespace is a value's content, and that value's own check
+// refuses it.
+func compact(octets []byte) bool {
+	inString := false
+	for i := 0; i < len(octets); i++ {
+		switch c := octets[i]; {
+		case inString && c == '\\':
+			i++ // The escaped byte cannot end the string.
+		case c == '"':
+			inString = !inString
+		case !inString && (c == ' ' || c == '\t' || c == '\n' || c == '\r'):
+			return false
+		}
+	}
+
+	return true
 }
 
 func isField(k string) bool {

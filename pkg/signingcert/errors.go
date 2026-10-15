@@ -16,6 +16,16 @@ var (
 	// object is a byte the signature covers and no parser looks at.
 	ErrTrailingBytes = errors.New("signingcert: bytes after the object")
 
+	// ErrWhitespace: insignificant whitespace before the object or between its tokens. The
+	// certificate is compact by contract, so one certificate has one spelling (ruled
+	// 2026-10-15). Whitespace after the object is ErrTrailingBytes.
+	ErrWhitespace = errors.New("signingcert: insignificant whitespace")
+
+	// ErrEscape: a backslash anywhere in the octets. Every value is a fixed string, base64,
+	// lowercase hex or a fixed-form timestamp, so no escape is ever legitimate, and decoding
+	// one is a parser-differential surface for nothing (ruled 2026-10-15).
+	ErrEscape = errors.New("signingcert: escape sequence")
+
 	// ErrDuplicateKey: a key repeated in any object, at any depth. encoding/json keeps the
 	// last occurrence and other languages differ, so a duplicate is a parser differential
 	// (contract, Strict parsing).
@@ -45,6 +55,11 @@ var (
 
 	// ErrKeyMalformed: key is not exactly 64 lowercase hexadecimal characters.
 	ErrKeyMalformed = errors.New("signingcert: key is not 64 lowercase hex characters")
+
+	// ErrSelfCertificate: key is the key whose Fingerprint is root -- a root certifying
+	// itself as a signing key. Refused here without the pinned roots (ruled 2026-10-15);
+	// verification's comparison against both pinned roots stays as well.
+	ErrSelfCertificate = errors.New("signingcert: key is the root's own key")
 
 	// ErrTimestampMalformed: not_before or not_after is not exactly YYYY-MM-DDTHH:MM:SSZ
 	// naming a real instant. On Encode: an instant with a fractional second, or a year

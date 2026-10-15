@@ -114,15 +114,21 @@ type certificateJSON struct {
 // trailing newline. What it returns is the artifact the root signs.
 //
 // It refuses everything Decode refuses, so it can never write bytes a client rejects: an
-// unknown env, a root that is not a fingerprint, a window that is empty, and an instant the
+// unknown env, a root that is not a fingerprint, a key that is the root's own, a window that
+// is empty, and an instant the
 // timestamp form cannot carry -- a fractional second, or a year outside 0000..9999. It
-// converts instants to UTC and never truncates them. Every refusal returns nil bytes.
+// converts instants to UTC and never truncates them. It cannot write whitespace or an escape,
+// which Decode also refuses: every value it writes has passed a check admitting neither.
+// Every refusal returns nil bytes.
 func Encode(o Opts) ([]byte, error) {
 	if !o.Env.Valid() {
 		return nil, ErrEnvUnknown
 	}
 	if !validRoot(o.Root) {
 		return nil, ErrRootMalformed
+	}
+	if Fingerprint(o.Key[:]) == o.Root {
+		return nil, ErrSelfCertificate
 	}
 
 	notBefore, notAfter := o.NotBefore.UTC(), o.NotAfter.UTC()

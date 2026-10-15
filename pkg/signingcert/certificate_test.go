@@ -163,6 +163,13 @@ func TestEncodeRefuses(t *testing.T) {
 		"a root that is not 32 bytes": {
 			func(o *Opts) { o.Root = "BuP9j9opu2CrWVV95h7bCuzbIxE0vjDnW0Vfjht5L6k" }, ErrRootMalformed,
 		},
+		"a root with a newline inside": {
+			// The standard library's base64 decoder skips newlines; the contract's form does not.
+			func(o *Opts) { o.Root = "BuP9j9opu2CrWVV95h7b\nCuzbIxE0vjDnW0Vfjht5L6k=" }, ErrRootMalformed,
+		},
+		"a key equal to the root's own key": {
+			func(o *Opts) { o.Key = mustHex32(t, testRootPubHex) }, ErrSelfCertificate,
+		},
 		"a not_before with a fractional second": {
 			func(o *Opts) { o.NotBefore = o.NotBefore.Add(time.Millisecond) }, ErrTimestampMalformed,
 		},
@@ -202,7 +209,7 @@ func TestEncodeRefuses(t *testing.T) {
 func TestDecodeOfEncodeIsTheOpts(t *testing.T) {
 	want := vectorCOpts(t)
 	want.Env = EnvProduction
-	want.Key = mustHex32(t, testRootPubHex)
+	want.Key = [32]byte(bytes.Repeat([]byte{0x07}, 32))
 
 	octets, err := Encode(want)
 	if err != nil {
@@ -276,6 +283,34 @@ func TestDecodeRefuses(t *testing.T) {
 			return replaceOnce(t, envField, envField+`,"x":[{"a":1,"a":2}]`)
 		}, ErrDuplicateKey},
 
+		// One spelling: no insignificant whitespace anywhere (ruled 2026-10-15). Trailing
+		// whitespace is ErrTrailingBytes above, which scan finds first.
+		{"a leading space", func(*testing.T) string { return " " + vectorC }, ErrWhitespace},
+		{"a leading newline", func(*testing.T) string { return "\n" + vectorC }, ErrWhitespace},
+		{"a space after a colon", func(t *testing.T) string {
+			return replaceOnce(t, envField, `"env": "staging"`)
+		}, ErrWhitespace},
+		{"a tab between members", func(t *testing.T) string {
+			return replaceOnce(t, envField+",", envField+",\t")
+		}, ErrWhitespace},
+		{"a carriage return before the closing brace", func(*testing.T) string {
+			return vectorC[:len(vectorC)-1] + "\r}"
+		}, ErrWhitespace},
+
+		// No backslash anywhere (ruled 2026-10-15): no value can legitimately need an escape.
+		{"an escape in a value", func(t *testing.T) string {
+			return replaceOnce(t, envField, `"env":"st\u0061ging"`)
+		}, ErrEscape},
+		{"an escape in a key", func(t *testing.T) string {
+			return replaceOnce(t, typeField, `"\u005ftype":"abylora.relay-list.signing-certificate"`)
+		}, ErrEscape},
+		{"an escaped solidus", func(t *testing.T) string {
+			return replaceOnce(t, typeField, `"_type":"abylora.relay-list.signing\/certificate"`)
+		}, ErrEscape},
+		{"an escaped newline in root", func(t *testing.T) string {
+			return replaceOnce(t, rootValue, `"BuP9j9opu2CrWVV95h7b\nCuzbIxE0vjDnW0Vfjht5L6k="`)
+		}, ErrEscape},
+
 		// The field set.
 		{"an unknown field", func(t *testing.T) string {
 			return replaceOnce(t, envField, envField+`,"serial":1`)
@@ -317,10 +352,6 @@ func TestDecodeRefuses(t *testing.T) {
 			// alphabet, which is also accepted below, so only the alphabet differs.
 			return replaceOnce(t, rootValue, `"`+base64.URLEncoding.EncodeToString(bytes.Repeat([]byte{0xff}, 32))+`"`)
 		}, ErrRootMalformed},
-		{"a root with a newline inside", func(t *testing.T) string {
-			// The standard library's base64 decoder skips newlines; the contract's form does not.
-			return replaceOnce(t, rootValue, `"BuP9j9opu2CrWVV95h7b\nCuzbIxE0vjDnW0Vfjht5L6k="`)
-		}, ErrRootMalformed},
 		{"a root with non-zero padding bits", func(t *testing.T) string {
 			return replaceOnce(t, rootValue, `"BuP9j9opu2CrWVV95h7bCuzbIxE0vjDnW0Vfjht5L6l="`)
 		}, ErrRootMalformed},
@@ -343,6 +374,11 @@ func TestDecodeRefuses(t *testing.T) {
 			return replaceOnce(t, keyValue, `"g`+keyValue[2:])
 		}, ErrKeyMalformed},
 		{"a key that is not a string", func(t *testing.T) string { return replaceOnce(t, keyValue, `[]`) }, ErrKeyMalformed},
+
+		// A self-certificate: key is the root that issued it (ruled 2026-10-15).
+		{"a key equal to the root's own key", func(t *testing.T) string {
+			return replaceOnce(t, keyValue, `"`+testRootPubHex+`"`)
+		}, ErrSelfCertificate},
 
 		// Timestamps: exactly YYYY-MM-DDTHH:MM:SSZ.
 		{"a numeric offset", func(t *testing.T) string {
@@ -412,7 +448,7 @@ func TestNoDecodeErrorCarriesTheInput(t *testing.T) {
 func TestEverySentinelIsDistinct(t *testing.T) {
 	all := []error{ErrMalformed, ErrTrailingBytes, ErrDuplicateKey, ErrUnknownField, ErrFieldMissing,
 		ErrTypeUnknown, ErrSpecVersionUnsupported, ErrEnvUnknown, ErrRootMalformed, ErrKeyMalformed,
-		ErrTimestampMalformed, ErrValidityEmpty}
+		ErrTimestampMalformed, ErrValidityEmpty, ErrWhitespace, ErrEscape, ErrSelfCertificate}
 
 	for i, a := range all {
 		for _, b := range all[i+1:] {
@@ -462,5 +498,41 @@ func TestACertificateRendersAsThePlaceholder(t *testing.T) {
 		if strings.Contains(line[i:], f) {
 			t.Errorf("the line carries %q: %s", f, line)
 		}
+	}
+}
+
+// Member order is not part of the format (ruled 2026-10-15): no verifier depends on it, as
+// with the relay list's _type. Vector C with its members reversed decodes to the same fields.
+func TestDecodeAcceptsMembersInAnyOrder(t *testing.T) {
+	members := strings.Split(strings.TrimSuffix(strings.TrimPrefix(vectorC, "{"), "}"), `,"`)
+	if len(members) != 7 {
+		t.Fatalf("split vector C into %d members, want 7", len(members))
+	}
+	reversed := make([]string, 0, len(members))
+	for i := len(members) - 1; i >= 0; i-- {
+		reversed = append(reversed, strings.TrimPrefix(members[i], `"`))
+	}
+	input := `{"` + strings.Join(reversed, `,"`) + "}"
+
+	c, err := Decode([]byte(input))
+	if err != nil {
+		t.Fatalf("Decode(%s) error = %v", input, err)
+	}
+	want, _ := Decode([]byte(vectorC))
+	if c != want {
+		t.Errorf("Decode of the reordered vector disagrees with vector C")
+	}
+}
+
+// Encode can produce neither insignificant whitespace nor an escape: every value it writes
+// has passed a check that admits neither. This pins that, since the two Decode refusals have
+// no reachable Encode counterpart to test.
+func TestEncodeWritesNoWhitespaceAndNoEscape(t *testing.T) {
+	octets, err := Encode(vectorCOpts(t))
+	if err != nil {
+		t.Fatalf("Encode() error = %v", err)
+	}
+	if i := bytes.IndexAny(octets, " \t\r\n\\"); i >= 0 {
+		t.Errorf("Encode() wrote %q at offset %d", octets[i], i)
 	}
 }
