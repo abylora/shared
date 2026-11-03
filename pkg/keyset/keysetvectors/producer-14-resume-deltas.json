@@ -1,0 +1,103 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "producer.resume",
+  "rules": [
+    "3"
+  ],
+  "cases": [
+    {
+      "id": "14-a-held-version-at-the-start-of-the-log-gets-every-delta",
+      "description": "A held_version equal to the oldest logged from_version gets every logged Delta and no snapshot.",
+      "held_version": "94000",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "deltas",
+        "deltas": [
+          {
+            "from_version": "94000",
+            "to_version": "95000"
+          },
+          {
+            "from_version": "95000",
+            "to_version": "96000"
+          },
+          {
+            "from_version": "96000",
+            "to_version": "97000"
+          }
+        ]
+      }
+    },
+    {
+      "id": "14-a-held-version-inside-the-log-gets-the-deltas-after-it",
+      "description": "A held_version inside the log gets the Deltas after it and no snapshot.",
+      "held_version": "95000",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "deltas",
+        "deltas": [
+          {
+            "from_version": "95000",
+            "to_version": "96000"
+          },
+          {
+            "from_version": "96000",
+            "to_version": "97000"
+          }
+        ]
+      }
+    },
+    {
+      "id": "14-a-held-version-equal-to-published-gets-nothing-and-no-snapshot",
+      "description": "A node already at the published version gets no Delta and no snapshot.",
+      "held_version": "97000",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "deltas",
+        "deltas": []
+      }
+    }
+  ]
+}

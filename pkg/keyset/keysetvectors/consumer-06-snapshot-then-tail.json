@@ -1,0 +1,132 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "1",
+    "3",
+    "9"
+  ],
+  "cases": [
+    {
+      "id": "06-a-snapshot-then-its-tail-apply-and-the-cursor-is-the-tails",
+      "description": "A snapshot at V, then a Delta from V to W, leaves the cursor at W; the versions are above 2^53 and W is not V + 1.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "0",
+        "set": []
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "0"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "9007199254740993"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "9007199254740993"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "9007199254740993",
+              "skipped": "0"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "9007199254740993",
+              "to_version": "9007199254741000",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "9007199254741000",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "9007199254741000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

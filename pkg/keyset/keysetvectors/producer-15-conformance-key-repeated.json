@@ -1,0 +1,428 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "producer.conformance",
+  "rules": [
+    "9",
+    "10",
+    "13"
+  ],
+  "cases": [
+    {
+      "id": "15-one-op-per-key-conforms",
+      "description": "One Upsert moving the key conforms.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": true
+      }
+    },
+    {
+      "id": "15-a-delta-that-misses-a-change-fails",
+      "description": "A Delta that leaves the old record in place does not give the new set.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": []
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "result_differs"
+      }
+    },
+    {
+      "id": "15-a-delta-whose-versions-are-not-the-sets-versions-fails",
+      "description": "A Delta to a version other than the new set's does not conform.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40120",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "versions_mismatch"
+      }
+    },
+    {
+      "id": "15-two-upserts-for-one-key-fail",
+      "description": "Two Upserts for one key fail even though the last one gives the new set.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400104",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "key_repeated"
+      }
+    },
+    {
+      "id": "15-a-zero-op-delta-conforms-when-nothing-changed",
+      "description": "A Delta with no ops conforms when the old and new sets are equal: a version bump that changes nothing.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": []
+      },
+      "expect": {
+        "conforms": true
+      }
+    },
+    {
+      "id": "15-a-delta-from-version-zero-fails",
+      "description": "A Delta from version 0 fails conformance on its shape (rule 9), whatever its ops.",
+      "old": {
+        "version": "0",
+        "set": []
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "0",
+        "to_version": "40060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "delta_shape"
+      }
+    },
+    {
+      "id": "15-a-delta-whose-to-version-is-not-above-its-from-version-fails",
+      "description": "A Delta whose to_version is not above its from_version fails conformance on its shape (rule 13).",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40000",
+        "ops": []
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "delta_shape"
+      }
+    },
+    {
+      "id": "15-a-delta-op-with-no-arm-fails",
+      "description": "A Delta op with neither an Upsert nor a Remove fails conformance on its shape (rule 13).",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": [
+          {}
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "delta_shape"
+      }
+    },
+    {
+      "id": "15-an-upsert-with-no-entry-fails",
+      "description": "An Upsert with no entry fails conformance on its shape (rule 13), not as a skipped entry.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": [
+          {
+            "upsert": {}
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "delta_shape"
+      }
+    },
+    {
+      "id": "15-a-remove-and-an-upsert-for-one-key-fail",
+      "description": "A Remove and an Upsert for one key fail even though they give the new set.",
+      "old": {
+        "version": "40000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "40060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "40000",
+        "to_version": "40060",
+        "ops": [
+          {
+            "remove": {
+              "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "key_repeated"
+      }
+    }
+  ]
+}

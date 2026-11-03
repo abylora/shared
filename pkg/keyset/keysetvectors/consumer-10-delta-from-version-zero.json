@@ -1,0 +1,59 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "9"
+  ],
+  "cases": [
+    {
+      "id": "10-a-delta-from-version-zero-is-a-violation-even-at-cursor-zero",
+      "description": "A Delta from version 0 is a violation even when the cursor is 0, where it is not a gap.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "0",
+        "set": []
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "0"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "0",
+              "to_version": "20500",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "delta_from_version_zero"
+          }
+        },
+        {
+          "hello": {
+            "held_version": "0"
+          }
+        }
+      ],
+      "final": {
+        "cursor": "0",
+        "set": [],
+        "skipped": "0"
+      }
+    }
+  ]
+}

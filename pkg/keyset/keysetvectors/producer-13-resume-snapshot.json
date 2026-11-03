@@ -1,0 +1,93 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "producer.resume",
+  "rules": [
+    "3",
+    "7"
+  ],
+  "cases": [
+    {
+      "id": "13-a-held-version-of-zero-gets-a-snapshot",
+      "description": "A node that holds nothing gets a snapshot, then the tail.",
+      "held_version": "0",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "snapshot",
+        "snapshot_version": "97000"
+      }
+    },
+    {
+      "id": "13-a-held-version-below-the-log-gets-a-snapshot",
+      "description": "A held_version older than the log gets a snapshot.",
+      "held_version": "93000",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "snapshot",
+        "snapshot_version": "97000"
+      }
+    },
+    {
+      "id": "13-a-held-version-inside-the-range-but-not-a-boundary-gets-a-snapshot",
+      "description": "A held_version between two logged versions is not one the log can resume from, so it gets a snapshot.",
+      "held_version": "95500",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "snapshot",
+        "snapshot_version": "97000"
+      }
+    },
+    {
+      "id": "13-an-empty-log-after-a-restart-gets-a-snapshot-even-at-published",
+      "description": "After a restart empties the log, every node takes a snapshot, one already at the published version included.",
+      "held_version": "97000",
+      "log": [],
+      "published": "97000",
+      "expect": {
+        "send": "snapshot",
+        "snapshot_version": "97000"
+      }
+    }
+  ]
+}

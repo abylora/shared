@@ -1,0 +1,491 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "producer.conformance",
+  "rules": [
+    "15"
+  ],
+  "cases": [
+    {
+      "id": "17-removes-sorted-by-raw-bytes-conform",
+      "description": "Removes in raw byte order conform.",
+      "old": {
+        "version": "81000",
+        "set": [
+          {
+            "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "81060",
+        "set": []
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "remove": {
+              "public_key": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "remove": {
+              "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          },
+          {
+            "remove": {
+              "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": true
+      }
+    },
+    {
+      "id": "17-removes-sorted-by-base64-text-fail",
+      "description": "Removes in base64 text order do not conform.",
+      "old": {
+        "version": "81000",
+        "set": [
+          {
+            "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "81060",
+        "set": []
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "remove": {
+              "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8"
+            }
+          },
+          {
+            "remove": {
+              "public_key": "0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          },
+          {
+            "remove": {
+              "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "not_sorted"
+      }
+    },
+    {
+      "id": "17-upserts-sorted-by-raw-bytes-conform",
+      "description": "Upserts in raw byte order conform.",
+      "old": {
+        "version": "81000",
+        "set": []
+      },
+      "new": {
+        "version": "81060",
+        "set": [
+          {
+            "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+                "tunnel_ip": "0a400104",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": true
+      }
+    },
+    {
+      "id": "17-upserts-sorted-by-base64-text-fail",
+      "description": "Upserts in base64 text order do not conform.",
+      "old": {
+        "version": "81000",
+        "set": []
+      },
+      "new": {
+        "version": "81060",
+        "set": [
+          {
+            "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+                "tunnel_ip": "0a400104",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "not_sorted"
+      }
+    },
+    {
+      "id": "17-upserts-out-of-order-fail",
+      "description": "Upserts in no order do not conform.",
+      "old": {
+        "version": "81000",
+        "set": []
+      },
+      "new": {
+        "version": "81060",
+        "set": [
+          {
+            "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+                "tunnel_ip": "0a400104",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "not_sorted"
+      }
+    },
+    {
+      "id": "17-keys-differing-after-the-first-byte-sorted-by-raw-bytes-conform",
+      "description": "Keys that share their first 31 bytes sort by the last one: in raw byte order they conform.",
+      "old": {
+        "version": "81000",
+        "set": []
+      },
+      "new": {
+        "version": "81060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111100",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "11111111111111111111111111111111111111111111111111111111111111ff",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111100",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "11111111111111111111111111111111111111111111111111111111111111ff",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": true
+      }
+    },
+    {
+      "id": "17-keys-differing-after-the-first-byte-out-of-order-fail",
+      "description": "The whole key is compared, not its first byte: keys that differ only in their last byte, out of order, do not conform.",
+      "old": {
+        "version": "81000",
+        "set": []
+      },
+      "new": {
+        "version": "81060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111100",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "11111111111111111111111111111111111111111111111111111111111111ff",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "11111111111111111111111111111111111111111111111111111111111111ff",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111100",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": false,
+        "failure": "not_sorted"
+      }
+    },
+    {
+      "id": "17-each-group-is-sorted-on-its-own",
+      "description": "The sort applies within each group: a Remove of a high key before an Upsert of a low one conforms.",
+      "old": {
+        "version": "81000",
+        "set": [
+          {
+            "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "new": {
+        "version": "81060",
+        "set": [
+          {
+            "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "delta": {
+        "from_version": "81000",
+        "to_version": "81060",
+        "ops": [
+          {
+            "remove": {
+              "public_key": "f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8"
+            }
+          },
+          {
+            "upsert": {
+              "entry": {
+                "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        ]
+      },
+      "expect": {
+        "conforms": true
+      }
+    }
+  ]
+}
