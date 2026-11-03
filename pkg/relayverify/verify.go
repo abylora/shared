@@ -112,7 +112,11 @@ func (v *Verifier) certificate(x, proofOctets []byte) (signingcert.Certificate, 
 
 	// Only now, on octets that verified.
 	cert, err := signingcert.Decode(x)
-	if err != nil {
+	switch {
+	case err == signingcert.ErrKeyWeak:
+		// Returned as-is: ErrCertificateKeyWeak is the same value.
+		return signingcert.Certificate{}, err
+	case err != nil:
 		return signingcert.Certificate{}, ErrCertificateMalformed
 	}
 	if cert.Root() != signingcert.Fingerprint(root[:]) {
@@ -121,7 +125,9 @@ func (v *Verifier) certificate(x, proofOctets []byte) (signingcert.Certificate, 
 	if k := cert.Key(); k == v.currentRoot || k == v.nextRoot {
 		return signingcert.Certificate{}, ErrCertificateKeyIsRoot
 	}
-	if weakKey(cert.Key()) {
+	// DEFENCE IN DEPTH, kept on purpose: unreachable while signingcert.Decode refuses a weak key
+	// itself, it holds the verdict if that ever changed.
+	if signingcert.IsWeakKey(cert.Key()) {
 		return signingcert.Certificate{}, ErrCertificateKeyWeak
 	}
 

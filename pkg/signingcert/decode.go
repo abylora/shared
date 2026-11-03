@@ -27,7 +27,9 @@ var fields = []string{fieldType, fieldSpecVersion, fieldEnv, fieldRoot, fieldKey
 // object; a duplicate key at any depth; any byte after the object, whitespace included;
 // insignificant whitespace anywhere else; a backslash anywhere; an unknown or a missing field; a _type other than Type; a spec_version other than the JSON
 // number 1; an env outside the two; a root that is not a fingerprint; a key that is not 64
-// lowercase hex characters; a key that is the root's own; a timestamp not exactly YYYY-MM-DDTHH:MM:SSZ; and not_before not
+// lowercase hex characters; a weak key (IsWeakKey: small-order or non-canonical, ErrKeyWeak, the
+// value Encode returns, so no Go code path can hold a parsed certificate carrying one); a key that
+// is the root's own; a timestamp not exactly YYYY-MM-DDTHH:MM:SSZ; and not_before not
 // before not_after. Member order is free: no verifier depends on it.
 func Decode(octets []byte) (Certificate, error) {
 	if err := scan(octets); err != nil {
@@ -79,6 +81,9 @@ func Decode(octets []byte) (Certificate, error) {
 	key, ok := parseKey(keyHex)
 	if !ok {
 		return Certificate{}, ErrKeyMalformed
+	}
+	if IsWeakKey(key) {
+		return Certificate{}, ErrKeyWeak
 	}
 	if Fingerprint(key[:]) == root {
 		return Certificate{}, ErrSelfCertificate

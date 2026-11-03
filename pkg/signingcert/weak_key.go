@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package relayverify
+package signingcert
 
 import "encoding/hex"
 
@@ -22,7 +22,7 @@ var smallOrderKeys = func() map[[32]byte]bool {
 	} {
 		var k [32]byte
 		if n, err := hex.Decode(k[:], []byte(h)); err != nil || n != len(k) {
-			panic("relayverify: a small-order encoding is not 32 bytes of hex")
+			panic("signingcert: a small-order encoding is not 32 bytes of hex")
 		}
 		m[k] = true
 	}
@@ -30,24 +30,34 @@ var smallOrderKeys = func() map[[32]byte]bool {
 	return m
 }()
 
-// weakKey reports whether k may not be certified as a signing key (contract, Roles are bound by
-// key): one of the 8 small-order encodings, or not a canonical point encoding. crypto/ed25519 --
-// the contract's verification rule, which this does not change -- accepts the signature R =
-// identity, S = 0 under the identity key over any message (speccheck case 0), so a certified
-// small-order key would let anyone sign lists.
+// IsWeakKey reports whether key may not be certified as a signing key (contract, Roles are bound
+// by key): one of the 8 small-order Ed25519 encodings, or not a canonical point encoding.
+//
+// THIS IS THE ONE COPY OF THE RULE, and it lives here so that every Go path holding a certificate
+// meets it. The contract refuses such a key "by clients and at the ceremony", and the ceremony
+// produces the certificate only through Encode: Encode refuses a weak key, Decode refuses one,
+// both with ErrKeyWeak, so no Go code can hold a parsed certificate carrying one; relayverify's
+// Verify and control-plane's ceremony call IsWeakKey rather than spell the list again. Two copies
+// would be a parser differential. A caller reports a true result as ErrKeyWeak, which
+// relayverify's ErrCertificateKeyWeak is an alias of.
+//
+// It checks the key alone, never any signature, needs no cryptography -- these are byte
+// comparisons -- and does not change the verification rule. crypto/ed25519, the contract's rule,
+// accepts the signature R = identity, S = 0 under the identity key over any message (speccheck
+// case 0), so a certified small-order key would let anyone sign lists.
 //
 // An encoding is the 255-bit little-endian y with the sign of x in the top bit. It is
 // non-canonical when y >= p = 2^255 - 19, or when the sign bit is set on a point whose x is 0,
 // which are exactly y = 1 and y = p - 1. An encoding that is canonical but not a point at all
 // fails every verification, so it fails closed without a check here.
-func weakKey(k [32]byte) bool {
-	if smallOrderKeys[k] {
+func IsWeakKey(key [32]byte) bool {
+	if smallOrderKeys[key] {
 		return true
 	}
 
-	y := k
+	y := key
 	y[31] &= 0x7f
-	signSet := k[31]&0x80 != 0
+	signSet := key[31]&0x80 != 0
 
 	return yAtLeastP(y) || (signSet && (y == yOne || y == yMinusOne))
 }
