@@ -2,6 +2,7 @@ package relaylist
 
 import (
 	"errors"
+	"net/netip"
 	"testing"
 
 	"github.com/abylora/shared/pkg/transport"
@@ -141,12 +142,20 @@ func TestEncodeRefusesACapacityWeightOutsideZeroToHundred(t *testing.T) {
 }
 
 // 0 is legitimate: it means "do not pick".
+//
+// The second relay is a pickable sibling (active, weight 50, usable endpoints), because a document
+// with no pickable relay is not publishable (relay-list.md at workspace root c2166da, Rules). The
+// boundary is a per-relay value; the sibling only keeps the document publishable.
 func TestEncodeAcceptsTheBoundaryCapacityWeights(t *testing.T) {
+	sibling := firstRelayOpts()
+	sibling.NodeID = secondNodeID
+	sibling.IPv4 = netip.MustParseAddr("192.0.2.20")
+
 	for _, weight := range []int{0, 100} {
 		opts := firstRelayOpts()
 		opts.CapacityWeight = weight
 		doc := testDocumentOpts()
-		doc.Relays = []Relay{NewRelay(opts)}
+		doc.Relays = []Relay{NewRelay(opts), NewRelay(sibling)}
 
 		if _, err := NewDocument(doc).Encode(); err != nil {
 			t.Errorf("Encode() for capacity_weight %d error = %v, want nil", weight, err)

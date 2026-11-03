@@ -49,6 +49,16 @@ func (e Endpoint) Port() int { return e.port }
 // a secret (contract, Rules).
 func (e Endpoint) Params() map[string]string { return maps.Clone(e.params) }
 
+// endpointKey is what makes two endpoints of one relay the same endpoint: an exact (kind, port).
+// Kinds may share a port (contract, Rules). Encode and Decode both check repeats through a map of
+// it, so a relay with many endpoints costs linear time, not quadratic.
+type endpointKey struct {
+	kind transport.Kind
+	port int
+}
+
+func (e Endpoint) key() endpointKey { return endpointKey{kind: e.kind, port: e.port} }
+
 // LogValue makes an Endpoint refuse to render itself, for APIEndpoint's reason: one rule with
 // no exceptions is the one nobody has to re-derive per type.
 func (Endpoint) LogValue() slog.Value { return slog.StringValue(redacted) }

@@ -1,0 +1,4 @@
+# relayverify fixture policy "next": throwaway keys, never a real log.
+log 72b3203d013316394ba8384e013e040f47b092acd49977ebe5175a292f3af1fb
+witness next-witness-1 a73a4d4d0ecac5fbb325bde468b10758936221dc6d00e464e809f8d5b46f46d2
+quorum next-witness-1

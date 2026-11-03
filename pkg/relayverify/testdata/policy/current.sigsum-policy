@@ -1,0 +1,6 @@
+# relayverify fixture policy "current": throwaway keys, never a real log.
+log 36cb827a92335b62ca7d4dfbd1965797edb1aeced25f2522d3be086dd819a371
+witness current-witness-1 0ad3005c383c2448dabea8ecd56464b2126e73a88536b5b78ed9b44b676596e4
+witness current-witness-2 f0897299dc85a7383eeeea59b9a393f2c476040341e816495021318284f4b389
+group current-quorum 2 current-witness-1 current-witness-2
+quorum current-quorum
