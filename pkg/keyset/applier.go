@@ -26,6 +26,9 @@ type Applier struct {
 // New returns an applier holding held at cursor, with no stream open and no key refused. A
 // node starting from nothing passes 0 and the zero Set. held must not contain own.
 //
+// A non-empty held at cursor 0 is supported: it is the rebuild path of rules 8 and 14,
+// New(own, 0, a.Held()), which keeps the last applied set and asks for a snapshot.
+//
 // A rebuilt Applier starts with an empty refused set, so given a non-zero cursor its skipped
 // gauge under-reports until the next snapshot: the refusals behind that cursor are not known. A
 // driver that restarts should start at cursor 0, which brings a snapshot (rule 3).
@@ -102,8 +105,13 @@ func (a *Applier) receiveOutsideSnapshot(m *keysetpb.ControlPlaneMessage, apply 
 	case *keysetpb.ControlPlaneMessage_Delta:
 		return a.receiveDelta(body.Delta, apply)
 	case *keysetpb.ControlPlaneMessage_Heartbeat:
-		if body.Heartbeat.GetCurrentVersion() < a.cursor {
+		switch current := body.Heartbeat.GetCurrentVersion(); {
+		case current < a.cursor:
 			return a.violate(ErrHeartbeatBelowCursor)
+		case current > a.cursor:
+			// Rule 6: every version up to current_version was delivered before this Heartbeat
+			// and no later message can close the gap, so the node reconnects at once.
+			return a.violate(ErrHeartbeatAboveCursor)
 		}
 
 		return Outcome{kind: OutcomeUnchanged}

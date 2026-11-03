@@ -119,7 +119,7 @@ key (rule 11). Then take the steps in order:
 | `outcome` | Meaning |
 |---|---|
 | `accumulating` | inside a snapshot: a `SnapshotBegin` or an `Upsert` was taken; nothing is sent |
-| `unchanged` | a legal `Heartbeat`: nothing changes, nothing is sent |
+| `unchanged` | a legal `Heartbeat`, one whose `current_version` equals the cursor: nothing changes, nothing is sent |
 | `applied` | with `"applied": {"version": "<u64>", "skipped": "<u64>"}`: the set was applied and the node sends exactly this `Applied`. Every cursor advance is reported (rule 5), including a zero-op `Delta`, a snapshot equal to the held set, and a snapshot below the cursor |
 | `apply_failed` | the apply failed: the cursor becomes 0 and the stream closes (rule 5) |
 | `violation` | with `"violation": "<word>"`: the stream closes, the cursor and set are unchanged, and the node reconnects with `Hello{held_version: cursor}` |
@@ -169,6 +169,7 @@ word, as a producer may compare `conforms` only:
 | `delta_versions_not_increasing` | 13 | is a `Delta` with `to_version` ≤ `from_version` |
 | `delta_gap` | 5 | is a `Delta` whose `from_version` is not the cursor |
 | `heartbeat_below_cursor` | 13 | is a `Heartbeat` whose `current_version` is below the cursor |
+| `heartbeat_above_cursor` | 6, 13 | is a `Heartbeat` whose `current_version` is above the cursor: the node reconnects at once, with no timer and no grace period. Every version up to `current_version` was delivered before it, and on a stream resumed at the published version the ceiling is the resumed `held_version` |
 
 A `Delta` is judged whole before any op applies: a violation anywhere in it applies none of it.
 

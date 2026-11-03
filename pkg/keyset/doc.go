@@ -18,8 +18,10 @@
 // takes one control-plane message and returns exactly one Outcome:
 //
 //   - accumulating: a SnapshotBegin or an Upsert inside a snapshot;
-//   - unchanged: a legal Heartbeat. One whose current_version is above the cursor is not acted
-//     on here: rule 6's reconnect waits for a delta that does not arrive, which is a timer;
+//   - unchanged: a legal Heartbeat, whose current_version equals the cursor. One above it is a
+//     violation (rules 6 and 13): every version up to it was delivered before it, so the node
+//     reconnects at once, with no timer. On a stream resumed at the published version the
+//     ceiling is the resumed held_version;
 //   - applied: a SnapshotEnd or a legal Delta was applied. Send Outcome.Applied(). Every advance
 //     is reported (rule 5), a zero-op Delta, a snapshot equal to the held set and a snapshot
 //     below the cursor (the answer to a held_version above the published version) included;

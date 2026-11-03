@@ -10,9 +10,9 @@ type OutcomeKind uint8
 const (
 	// OutcomeAccumulating: inside a snapshot (a SnapshotBegin or an Upsert). Nothing to send.
 	OutcomeAccumulating OutcomeKind = iota + 1
-	// OutcomeUnchanged: a legal Heartbeat. Nothing changes, nothing is sent, the stream stays
-	// open. A current_version above the cursor is not acted on here: rule 6's reconnect waits
-	// for a delta that does not arrive, which is the driver's timer.
+	// OutcomeUnchanged: a legal Heartbeat, whose current_version equals the cursor. Nothing
+	// changes, nothing is sent, the stream stays open. One above or below the cursor is a
+	// violation (rules 6 and 13), and the node reconnects at once.
 	OutcomeUnchanged
 	// OutcomeApplied: a SnapshotEnd or a legal Delta was applied. Send Applied(); the cursor
 	// advanced, possibly to a lower version (a snapshot below the cursor) and possibly with

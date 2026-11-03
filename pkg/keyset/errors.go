@@ -26,6 +26,7 @@ var (
 	ErrDeltaVersionsNotIncreasing = errors.New("keyset: a delta's to_version is not above its from_version")
 	ErrDeltaGap                   = errors.New("keyset: a delta's from_version is not the cursor")
 	ErrHeartbeatBelowCursor       = errors.New("keyset: a heartbeat's current_version is below the cursor")
+	ErrHeartbeatAboveCursor       = errors.New("keyset: a heartbeat's current_version is above the cursor")
 )
 
 // ErrStreamClosed is returned by Receive, as OutcomeMisuse, when no stream is open: before the
