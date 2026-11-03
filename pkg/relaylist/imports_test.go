@@ -75,14 +75,23 @@ func parsePackage(t *testing.T) []parsedFile {
 //     themselves.
 //   - NO KEY MATERIAL. No crypto package and no os: nothing here signs, loads a key, or reads
 //     a file. Signing is the producer's, in its own package.
+//
+// Each standard-library ban is BY PREFIX, so a subpackage cannot slip past: log/... (log/slog
+// alone is permitted, for the reason above), os/... (os/exec included), net/... (net/netip alone
+// is permitted: an address value type with no resolver -- hostname is a label, never resolved),
+// syscall and unsafe.
 func TestThePackageImportsOnlyTheStandardLibraryAndTransportAndNoLoggerOrKeyMaterial(t *testing.T) {
 	const transportPath = "github.com/abylora/shared/pkg/transport"
 
-	forbiddenExact := map[string]string{
-		"fmt": "fmt is how a hostname or an address reaches an error string (D19)",
-		"log": "a Relay holds a hostname, addresses and a provider (D19)",
-		"os":  "nothing here reads a file -- in particular, no key file",
+	forbiddenTree := map[string]string{
+		"fmt":     "fmt is how a hostname or an address reaches an error string (D19)",
+		"log":     "a Relay holds a hostname, addresses and a provider (D19)",
+		"os":      "nothing here reads a file -- in particular, no key file -- or starts a process",
+		"net":     "nothing here resolves or dials: hostname is a label, never resolved",
+		"syscall": "no way around the bans above",
+		"unsafe":  "no way around the bans above",
 	}
+	permittedInForbiddenTree := map[string]bool{"log/slog": true, "net/netip": true}
 	forbiddenPrefix := map[string]string{
 		"crypto/": "no key material in the wire types; signing is the producer's",
 	}
@@ -93,13 +102,28 @@ func TestThePackageImportsOnlyTheStandardLibraryAndTransportAndNoLoggerOrKeyMate
 			if p != transportPath && strings.Contains(strings.SplitN(p, "/", 2)[0], ".") {
 				t.Errorf("%s imports %q: only the standard library and %s are permitted", f.name, p, transportPath)
 			}
-			if why, ok := forbiddenExact[p]; ok {
-				t.Errorf("%s imports %q: %s", f.name, p, why)
+			for root, why := range forbiddenTree {
+				if (p == root || strings.HasPrefix(p, root+"/")) && !permittedInForbiddenTree[p] {
+					t.Errorf("%s imports %q: %s", f.name, p, why)
+				}
 			}
 			for prefix, why := range forbiddenPrefix {
 				if p == strings.TrimSuffix(prefix, "/") || strings.HasPrefix(p, prefix) {
 					t.Errorf("%s imports %q: %s", f.name, p, why)
 				}
+			}
+		}
+	}
+}
+
+// NO DOT IMPORT AND NO BLANK IMPORT. A dot import makes time.Now callable as plain Now, which
+// the selector-based clock guard below cannot see; a blank import runs a package's init for its
+// side effects alone. Neither has a use here, so neither is permitted in a non-test file.
+func TestThePackageHasNoDotOrBlankImport(t *testing.T) {
+	for _, f := range parsePackage(t) {
+		for _, spec := range f.file.Imports {
+			if spec.Name != nil && (spec.Name.Name == "." || spec.Name.Name == "_") {
+				t.Errorf("%s imports %s as %q: dot and blank imports are refused", f.name, spec.Path.Value, spec.Name.Name)
 			}
 		}
 	}

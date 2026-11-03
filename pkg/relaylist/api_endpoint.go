@@ -58,17 +58,8 @@ func (e APIEndpoint) Transports() []FetchTransport { return slices.Clone(e.trans
 // no further syntax check: the contract says "host", and api_endpoints may carry names as
 // well as raw IPs (D18 mandates raw IPs for the client's shipped bootstrap set, not here).
 func (e APIEndpoint) Validate() error {
-	if e.host == "" {
-		return ErrAPIEndpointHostAbsent
-	}
-	if strings.ContainsFunc(e.host, unicode.IsSpace) || strings.ContainsAny(e.host, "[]/") {
-		return ErrAPIEndpointHostMalformed
-	}
-	if strings.Contains(e.host, ":") {
-		addr, err := netip.ParseAddr(e.host)
-		if err != nil || !addr.Is6() || addr.Zone() != "" {
-			return ErrAPIEndpointHostMalformed
-		}
+	if err := validateHost(e.host); err != nil {
+		return err
 	}
 
 	if e.port < 1 || e.port > 65535 {
@@ -84,6 +75,24 @@ func (e APIEndpoint) Validate() error {
 		}
 		if slices.Contains(e.transports[:i], t) {
 			return ErrAPIEndpointTransportRepeated
+		}
+	}
+
+	return nil
+}
+
+// validateHost applies Validate's host rules; Decode applies the same rules to a host it reads.
+func validateHost(host string) error {
+	if host == "" {
+		return ErrAPIEndpointHostAbsent
+	}
+	if strings.ContainsFunc(host, unicode.IsSpace) || strings.ContainsAny(host, "[]/") {
+		return ErrAPIEndpointHostMalformed
+	}
+	if strings.Contains(host, ":") {
+		addr, err := netip.ParseAddr(host)
+		if err != nil || !addr.Is6() || addr.Zone() != "" {
+			return ErrAPIEndpointHostMalformed
 		}
 	}
 

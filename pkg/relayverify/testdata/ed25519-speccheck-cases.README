@@ -1,0 +1,18 @@
+ed25519-speccheck-cases.json is third-party content, committed verbatim and unmodified.
+
+Source:     https://github.com/novifinancial/ed25519-speccheck
+Commit:     65519336fda78a3d016e947df6d82848aca0c9da
+File:       cases.json
+SHA-256:    08e47a36d9aead288664930505584f353fff113ab854f2800db1e4f5b3540450
+Licence:    Apache License, Version 2.0 (the upstream repository's LICENSE at that commit,
+            reproduced verbatim in ed25519-speccheck-cases.LICENSE; the upstream README says
+            "This project is Apache 2.0 licensed"). The upstream repository has no NOTICE file.
+Reference:  "Taming the many EdDSAs" (Chalkias, Garillot, Nikolaenko, 2020).
+
+These are the relay list contract's twelve Ed25519 edge vectors
+(<workspace>/docs/contracts/relay-list.md, The edge vectors). speccheck_test.go checks the
+file's SHA-256 against the value above before parsing a byte of it, and holds every case to the
+contract's verdict, case 11 accepted.
+
+The file is not covered by this repository's AGPL-3.0-only licence; it remains under the
+Apache License 2.0.

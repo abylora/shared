@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 	"time"
+	"unicode/utf8"
 )
 
 // DocumentType is the relay list's statement type, written as the document's first field,
@@ -69,8 +70,10 @@ func (d Document) ExpiresAt() time.Time { return d.expiresAt }
 // addresses and provider at once (D19).
 func (Document) LogValue() slog.Value { return slog.StringValue(redacted) }
 
-// The wire structs. Unexported, so the JSON tags below are the ONLY place a field name is
-// spelled, and they are the contract's names in the contract's order. The order is for a
+// The wire structs. Unexported, so the JSON tags below are the only place a field name is
+// spelled for WRITING, and they are the contract's names in the contract's order. decode.go
+// spells them for reading, and TestDecodeOfTheGoldenDocumentReEncodesToTheGoldenBytes holds the
+// two spellings together. The order is for a
 // reader; under Reading A nothing depends on it being stable across versions. That includes
 // _type: it is first by convention, for a reader; no verifier may depend on its position. A
 // decoder finds it by key. encoding/json writes fields in declaration order, so Type stays the
@@ -125,7 +128,15 @@ type endpointJSON struct {
 // rented}; a capacity_weight outside 0..100; or an
 // endpoint whose kind is not transport.Kind.Valid, whose port is outside 1..65535, or whose
 // (kind, port) repeats an earlier one. A relay refusal is a carrier type naming that relay's
-// node_id and nothing else, wrapping its sentinel. Every refusal returns nil bytes.
+// node_id and nothing else, wrapping its sentinel. The relay-level rules are classifyRelay's,
+// the ones Decode scopes with: an empty node_id, no endpoint, a zero ipv4 or an empty key are
+// *RelayIncompleteError as in v0.3.0; an ipv4 that is not plain IPv4, an ipv6 that is not plain
+// IPv6 and a malformed key have carriers of their own. Any string that is not valid UTF-8 is
+// ErrTextNotUTF8, bare. Then the document-level rules: a node_id carried by more than one relay,
+// as a *RelayRepeatedError naming the first repeat in relay order; and a document in which no
+// relay is Pickable, with ErrNoPickableRelay, bare: "drain or zero-weight every node" cannot be
+// published.
+// Every refusal returns nil bytes.
 func (d Document) Encode() ([]byte, error) {
 	if d.version < 1 {
 		return nil, ErrVersionNotPositive
@@ -150,6 +161,9 @@ func (d Document) Encode() ([]byte, error) {
 	}
 
 	for _, e := range d.apiEndpoints {
+		if !utf8.ValidString(e.host) {
+			return nil, ErrTextNotUTF8
+		}
 		if err := e.Validate(); err != nil {
 			return nil, err
 		}
@@ -163,6 +177,14 @@ func (d Document) Encode() ([]byte, error) {
 		}
 		wire.Relays = append(wire.Relays, rj)
 	}
+	// The document-level rules, after every relay's own: a repeated node_id (repeatedNodeIDs,
+	// the rule Decode scopes with), then no pickable relay (Pickable, the one predicate).
+	if _, first := repeatedNodeIDs(d.relays); first != "" {
+		return nil, &RelayRepeatedError{nodeID: first}
+	}
+	if !slices.ContainsFunc(d.relays, Relay.Pickable) {
+		return nil, ErrNoPickableRelay
+	}
 
 	encoded, err := json.Marshal(wire)
 	if err != nil {
@@ -172,19 +194,21 @@ func (d Document) Encode() ([]byte, error) {
 	return encoded, nil
 }
 
-// wire converts a relay to its wire form, or refuses an incomplete one.
+// wire converts a relay to its wire form, or refuses it. The relay-level rules are classifyRelay's,
+// the same function Decode scopes with; then the producer-only rules (status and ownership, which
+// a client keeps verbatim) and the endpoint-level ones (a kind or port no client can use).
 func (r Relay) wire() (relayJSON, error) {
-	if r.nodeID == "" || r.wgPublicKey == "" || !r.ipv4.IsValid() || len(r.endpoints) == 0 {
-		return relayJSON{}, &RelayIncompleteError{nodeID: r.nodeID}
+	if !r.textValid() {
+		return relayJSON{}, ErrTextNotUTF8
+	}
+	if err := r.relayLevelRefusal(); err != nil {
+		return relayJSON{}, err
 	}
 	if !r.status.Valid() {
 		return relayJSON{}, &StatusUnknownError{nodeID: r.nodeID}
 	}
 	if !r.ownership.Valid() {
 		return relayJSON{}, &OwnershipUnknownError{nodeID: r.nodeID}
-	}
-	if r.capacityWeight < 0 || r.capacityWeight > 100 {
-		return relayJSON{}, &CapacityWeightOutOfRangeError{nodeID: r.nodeID}
 	}
 
 	var ipv6 *string
@@ -194,16 +218,12 @@ func (r Relay) wire() (relayJSON, error) {
 	}
 
 	endpoints := make([]endpointJSON, 0, len(r.endpoints))
-	for i, e := range r.endpoints {
+	for _, e := range r.endpoints {
 		if !e.kind.Valid() {
 			return relayJSON{}, &EndpointKindUnknownError{nodeID: r.nodeID}
 		}
 		if e.port < 1 || e.port > 65535 {
 			return relayJSON{}, &EndpointPortOutOfRangeError{nodeID: r.nodeID}
-		}
-		// Only an exact (kind, port) repeat: kinds may share a port (contract, Rules).
-		if slices.ContainsFunc(r.endpoints[:i], func(p Endpoint) bool { return p.kind == e.kind && p.port == e.port }) {
-			return relayJSON{}, &EndpointRepeatedError{nodeID: r.nodeID}
 		}
 
 		params := e.params
@@ -230,4 +250,67 @@ func (r Relay) wire() (relayJSON, error) {
 		Provider:       r.provider,
 		Endpoints:      endpoints,
 	}, nil
+}
+
+// APIEndpoints returns where to fetch the next list, as a copy.
+func (d Document) APIEndpoints() []APIEndpoint { return slices.Clone(d.apiEndpoints) }
+
+// Relays returns the published nodes, as a copy.
+func (d Document) Relays() []Relay { return slices.Clone(d.relays) }
+
+// relayLevelRefusal classifies the relay with classifyRelay and maps the reason to its named
+// carrier. The cases v0.3.0 already refused -- an empty node_id, no endpoint, a zero ipv4 and an
+// empty wg_public_key -- keep their *RelayIncompleteError, so a consumer matching ErrRelayIncomplete
+// sees no change; only a present but invalid address or key gets a carrier of its own.
+func (r Relay) relayLevelRefusal() error {
+	why := classifyRelay(relayFacts{
+		nodeID:         r.nodeID,
+		endpointsEmpty: len(r.endpoints) == 0,
+		ipv4:           r.ipv4,
+		ipv6Given:      r.ipv6.IsValid(),
+		ipv6:           r.ipv6,
+		wgPublicKey:    r.wgPublicKey,
+		capacityWeight: int64(r.capacityWeight),
+		endpoints:      r.endpoints,
+	})
+
+	switch {
+	case why == relayKept:
+		return nil
+	case why == relayRefusedIPv4 && r.ipv4.IsValid():
+		return &RelayIPv4InvalidError{nodeID: r.nodeID}
+	case why == relayRefusedIPv6:
+		return &RelayIPv6InvalidError{nodeID: r.nodeID}
+	case why == relayRefusedWGPublicKey && r.wgPublicKey != "":
+		return &RelayWGPublicKeyInvalidError{nodeID: r.nodeID}
+	case why == relayRefusedCapacityWeight:
+		return &CapacityWeightOutOfRangeError{nodeID: r.nodeID}
+	case why == relayRefusedEndpointRepeated:
+		return &EndpointRepeatedError{nodeID: r.nodeID}
+	}
+
+	// relayRefusedNodeIDEmpty, relayRefusedNoEndpoint, a zero ipv4 or an empty key. The two
+	// Decode-only reasons, a malformed field and a repeated node_id, cannot be produced from a
+	// Relay's own values, and a repeated node_id is refused at document level.
+	return &RelayIncompleteError{nodeID: r.nodeID}
+}
+
+// textValid reports whether every string the relay carries is valid UTF-8. encoding/json would
+// write an invalid one as U+FFFD, and then the artifact would not say what the producer was given.
+func (r Relay) textValid() bool {
+	for _, s := range []string{string(r.nodeID), r.hostname, r.wgPublicKey, r.country, r.city, string(r.status),
+		string(r.ownership), r.provider} {
+		if !utf8.ValidString(s) {
+			return false
+		}
+	}
+	for _, e := range r.endpoints {
+		for k, v := range e.params {
+			if !utf8.ValidString(k) || !utf8.ValidString(v) {
+				return false
+			}
+		}
+	}
+
+	return true
 }
