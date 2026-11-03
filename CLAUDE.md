@@ -5,9 +5,15 @@
 
 ## What this is
 
-A Go module of code that more than one service must agree on — the transport
-implementations and, now, the relay list's wire types (`pkg/relaylist`, D26); the key
-set's wire types later. It is a **library, not a service**: nothing runs it on its own.
+A Go module of code that more than one service must agree on (D26):
+- the transport implementations (`pkg/transport`);
+- the relay list's wire types (`pkg/relaylist`), its signing certificate
+  (`pkg/signingcert`) and its client-side verifier (`pkg/relayverify`);
+- the key set stream's wire types (`pkg/keyset/keysetpb`, generated from `proto/`);
+- the key set's reference applier and delta vectors (`pkg/keyset`,
+  `pkg/keyset/keysetvectors`).
+
+It is a **library, not a service**: nothing runs it on its own.
 
 It exists because a transport is a *protocol* between the node and the client, not a
 utility. If each side grew its own Shadowsocks or QUIC implementation they would drift,
