@@ -1,0 +1,218 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+
+// The key set stream's wire definition (D26): one bidirectional stream per node,
+// opened by the node (D9). Messages, fields and the rules quoted on them come from
+// <workspace>/docs/contracts/key-set.md, Record, Delivery and Readiness, and from
+// nowhere else.
+//
+// TYPES ONLY. Nothing generated from this file checks a rule. The rules quoted below
+// bind the producer and the consumer. A reference applier, planned beside the delta
+// vectors in pkg/keyset, is where they will be written as code. Quoting a rule here
+// is not enforcing it.
+//
+// THE NAMES AND NUMBERS ARE WIRE CONTRACT. The package and the service form the gRPC
+// method path /abylora.keyset.v1.KeySet/Stream, and the field numbers form the
+// encoding. Renaming or renumbering either breaks every deployed node, exactly as
+// renaming a transport.Kind string breaks every client. A change of meaning is a new
+// abylora.keyset.v2 package beside this one, never an edit here.
+
+syntax = "proto3";
+
+package abylora.keyset.v1;
+
+option go_package = "github.com/abylora/shared/pkg/keyset/keysetpb";
+
+// KeySet carries key set delivery and nothing else. Enrollment (Slice 6) is a
+// separate service, never a second method here.
+service KeySet {
+  // Stream is a node's one stream. The node opens it and sends NodeMessage; the
+  // control plane sends ControlPlaneMessage.
+  rpc Stream(stream NodeMessage) returns (stream ControlPlaneMessage);
+}
+
+// KeySetEntry is the key set's record: these four fields and nothing else, and the
+// record is final. It is the only per-device record that reaches every node. It has
+// no account id, which keeps the account a device belongs to off every node
+// (invariant 2), and no preshared key or other secret, which keeps the key set a
+// channel that carries no secret (key-set.md, No secrets; D16).
+//
+// A malformed entry is skipped, not refused, and the consumer never logs it
+// (rule 11). Malformed is defined per field below.
+message KeySetEntry {
+  // The device's WireGuard public key: 32 raw bytes, not base64. A key of any
+  // other length, or equal to the receiving node's own interface key, is
+  // malformed.
+  bytes public_key = 1;
+
+  // The device's IPv4 tunnel address: 4 raw address bytes. A value that is not
+  // exactly 4 bytes, an address outside 10.64.0.0/10, or one inside the reserved
+  // 10.64.0.0/24, is malformed. No two entries share an address (rule 12).
+  bytes tunnel_ip = 2;
+
+  // The device's IPv6 tunnel address: 16 raw address bytes, or empty when the
+  // device has none. Length 0 is absence; 16 zero bytes would be the address ::,
+  // a different value. Test the length, never nil. Always empty until an IPv6
+  // pool is ruled. Length 16 is not malformed: the consumer installs nothing for
+  // it and keeps the entry. Any other length is malformed.
+  bytes tunnel_ip6 = 3;
+
+  // Entitlement expiry: Unix seconds, a multiple of 86400 (00:00:00Z of a day).
+  // Any other value is malformed. An entry is valid while now < valid_until, so at
+  // now == valid_until it is already invalid. The node refuses an invalid entry
+  // locally; the set has no time filter.
+  int64 valid_until = 4;
+}
+
+// NodeMessage is everything a node sends: Hello first, then Applied after each
+// successful apply. A node reports versions and one aggregate gauge, never which
+// keys it holds or refuses, so nothing it says can become a per-device, per-node
+// record (D34). Never add a per-key arm.
+//
+// THE NODE'S DIRECTION IS A STATE MACHINE TOO, enforced by the control plane
+// (rule 16). The first message is a Hello, and there is exactly one per stream.
+// Each Applied.version is a version delivered on this stream, and no lower than
+// the previous Applied. No arm, an unknown arm, an Applied before the Hello, a
+// second Hello, or an Applied naming an undelivered version closes the stream,
+// and the control plane records nothing from the violating message onward. A
+// Hello already recorded at the start of that stream stands: rolling it back
+// would restore a stale, higher applied version, and a rebooted node would read
+// as ready.
+message NodeMessage {
+  oneof body {
+    Hello hello = 1;
+    Applied applied = 2;
+  }
+}
+
+// Hello opens the stream. held_version is the node's cursor: the version of the
+// set its interface holds, or 0 when it holds nothing, which on a RAM-only node is
+// every boot. Every version is at least 1 (the counter's start is seeded at
+// random, so a version does not publish how many changes there have been), so 0
+// always means "holds nothing", and proto3 encoding 0 as an absent field loses
+// nothing. The control plane records held_version as the node's applied version
+// at once (Readiness).
+message Hello {
+  uint64 held_version = 1;
+}
+
+// Applied reports every cursor advance after a successful apply (rule 5),
+// including one that changes nothing on the interface: a zero-op Delta, or a
+// snapshot equal to the held set. Otherwise the control plane's recorded applied
+// version lags, and a client whose target came from a no-visible-change epoch
+// waits without bound.
+message Applied {
+  // The node's cursor after the apply. Sent for every advance, a no-op one
+  // included.
+  uint64 version = 1;
+
+  // How many entries of the applied set the node currently refuses under rules
+  // 11 and 12: a gauge, one aggregate number. It counts entries currently
+  // refused, not skips on this stream, because a refusal from an earlier snapshot
+  // persists across a resume by deltas, during which the entry is never resent.
+  // It is how a producer defect becomes visible. It never names an entry.
+  uint64 skipped = 2;
+}
+
+// ControlPlaneMessage is everything the control plane sends.
+//
+// THE STREAM IS A STATE MACHINE (rule 13). Outside a snapshot, only
+// snapshot_begin with a version of at least 1, delta and heartbeat are legal.
+// Inside one, only upsert and a snapshot_end carrying the same version are legal.
+// Anything else is a violation, and so is an unset or unknown arm: proto3 decodes
+// both as no body, with an unknown arm kept as an unknown field, so one nil check
+// detects them. That check detects a message with no known arm, and only that. A
+// message carrying a known arm plus an unknown field, or two known arms (the
+// decoder keeps the last), decodes with a body; a consumer cannot detect those,
+// and the contract does not ask it to. A violation closes the stream.
+//
+// A SNAPSHOT IS ALWAYS BRACKETED, the empty one included (rule 1). An empty
+// snapshot is snapshot_begin followed directly by snapshot_end, and it means "the
+// set is empty", never "no change". Every arm is a message, so an arm is on the
+// wire even when every field inside it is zero.
+message ControlPlaneMessage {
+  oneof body {
+    SnapshotBegin snapshot_begin = 1;
+    // Inside a snapshot only.
+    Upsert upsert = 2;
+    SnapshotEnd snapshot_end = 3;
+    Delta delta = 4;
+    Heartbeat heartbeat = 5;
+  }
+}
+
+// SnapshotBegin opens a snapshot of the set at version, which is at least 1. A
+// version below the node's cursor is legal: it answers a held_version greater
+// than current.
+message SnapshotBegin {
+  uint64 version = 1;
+}
+
+// Upsert adds an entry, or replaces the record of the entry with the same
+// public_key; it is idempotent (rule 2). One type in two places with one meaning:
+// a ControlPlaneMessage arm, inside a snapshot only, and a DeltaOp arm. An Upsert
+// with no entry is a violation (rule 13): it has no key, so rule 11's skip cannot
+// apply to it.
+message Upsert {
+  KeySetEntry entry = 1;
+}
+
+// SnapshotEnd closes the open snapshot. version equals that snapshot's
+// SnapshotBegin version. At SnapshotEnd the accumulated entries replace the set
+// the node holds.
+message SnapshotEnd {
+  uint64 version = 1;
+}
+
+// Delta moves the set from from_version to to_version. from_version is at least 1,
+// and to_version is greater than from_version. A from_version other than the
+// node's cursor is a gap, and the node reconnects (rule 5).
+//
+// DELTAS ARE PUBLISHED ON A 60-SECOND EPOCH (rule 15). At each boundary aligned to
+// a whole UTC minute, the producer emits one Delta covering everything since the
+// previous boundary, to every node at once; changes are never streamed as they
+// happen, so a Delta does not time one account's payment to the second. A
+// snapshot carries the set as of the last published boundary, never the live
+// projection, so nothing a node receives, and no version it can see, runs ahead
+// of the last boundary.
+message Delta {
+  uint64 from_version = 1;
+  uint64 to_version = 2;
+
+  // At most one op per public_key, every Remove before every Upsert, and the
+  // consumer applies them in order (rule 10). Removes first is what lets an
+  // address freed by a purge and handed to a new device arrive in the same Delta
+  // without tripping rule 12. Within each group, ops are sorted by public_key as
+  // raw bytes, lexicographically (Go's bytes.Compare), never by the base64 text,
+  // whose alphabet is not in byte order, so the order reveals nothing about which
+  // entries changed together (rule 15). The consumer still applies ops in the
+  // order received. It may be empty: a version bump that changes nothing in the
+  // set, which the consumer applies by advancing its cursor.
+  repeated DeltaOp ops = 3;
+}
+
+// DeltaOp is one op of a Delta, keyed by public_key. An op with neither upsert
+// nor remove, or with an unknown arm, is a violation (rule 13).
+message DeltaOp {
+  oneof op {
+    Upsert upsert = 1;
+    Remove remove = 2;
+  }
+}
+
+// Remove removes the entry with public_key. Removing an unknown key is a no-op
+// (rule 2).
+message Remove {
+  bytes public_key = 1;
+}
+
+// Heartbeat is sent every 15 seconds when nothing else is sent (rule 6).
+// current_version never exceeds the last version delivered on this stream, so a
+// consumer needs no grace window. A node that receives nothing for 45 seconds
+// (three missed heartbeats) treats the stream as dead and reconnects. The 45
+// seconds count only time spent waiting on the stream, so a long kernel apply of
+// the node's own does not expire it. A node whose cursor is behind
+// current_version with no delta arriving reconnects. A Heartbeat inside a
+// snapshot, or whose current_version is below the cursor, is a violation.
+message Heartbeat {
+  uint64 current_version = 1;
+}
