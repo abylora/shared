@@ -27,7 +27,8 @@
 //     cases, cosigned at not_before - 11m and - 10m, and not_after + 9m, + 10m and + 11m, and the
 //     split case: witness 1 at not_after + 9m, witness 2 at not_after + 11m.
 //   - The identity-key attack. certificate/identity-key.json certifies the identity point as a
-//     signing key, and list/vector-l.identity-key.proof logs vector L with the "signature"
+//     signing key -- vector C with its key replaced by hand, because signingcert.Encode refuses a
+//     weak key -- and list/vector-l.identity-key.proof logs vector L with the "signature"
 //     R = identity, S = 0, which crypto/ed25519 accepts for that key over any message.
 //   - Policies per proof. Every proof is logged on log-current and cosigned by both current
 //     witnesses, except the *.next.proof files (log-next, cosigned by next-witness-1) and the
@@ -285,7 +286,8 @@ func main() {
 		{"next-root-certifies-current-root", certificate(signingcert.Fingerprint(nextRootPub[:]), raw(root)), nextRoot},
 		{"root-names-the-other-root", certificate(signingcert.Fingerprint(nextRootPub[:]), raw(signing)), root},
 		{"duplicate-key", []byte(replaceOnce(vectorC, `"env":"staging"`, `"env":"staging","env":"staging"`)), root},
-		{"identity-key", certificate(signingcert.Fingerprint(rootPub[:]), identityKey), root},
+		// Written by hand, as an attacker would: Encode refuses a weak key.
+		{"identity-key", []byte(replaceOnce(vectorC, `"key":"`+publicHex(signing)+`"`, `"key":"`+hex.EncodeToString(identityKey[:])+`"`)), root},
 	} {
 		write("certificate/"+f.name+".json", f.octets)
 		write("certificate/"+f.name+".current.proof", logged(f.octets, f.signer, logCurrent, currentAtCertT...))

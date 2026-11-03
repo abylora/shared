@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/abylora/shared/pkg/relaylist"
+	"github.com/abylora/shared/pkg/signingcert"
 	"github.com/abylora/shared/pkg/transport"
 )
 
@@ -134,6 +135,16 @@ var allSentinels = []error{
 	ErrListProofMalformed, ErrListNotSignedByCertificate, ErrListSignatureInvalid, ErrListProofInvalid,
 	ErrListOutsideCertificateValidity, ErrListDuplicateKey, ErrListMalformed, ErrListHasNoPickableRelay,
 	ErrListRolledBack,
+}
+
+// ErrCertificateKeyWeak is an ALIAS of signingcert.ErrKeyWeak, not a second error: one value, so
+// errors.Is and == match whichever layer caught the weak key -- signingcert's Decode, or this
+// package's own defence-in-depth check -- and its text is signingcert's, which is the point. It is
+// the one sentinel of this package whose text does not start "relayverify: ".
+func TestErrCertificateKeyWeakIsSigningcertsErrKeyWeak(t *testing.T) {
+	if ErrCertificateKeyWeak != signingcert.ErrKeyWeak {
+		t.Error("ErrCertificateKeyWeak is not signingcert.ErrKeyWeak")
+	}
 }
 
 // Every error is a constant sentinel carrying no hostname, address, node_id or provider.

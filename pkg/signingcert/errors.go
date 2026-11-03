@@ -56,6 +56,13 @@ var (
 	// ErrKeyMalformed: key is not exactly 64 lowercase hexadecimal characters.
 	ErrKeyMalformed = errors.New("signingcert: key is not 64 lowercase hex characters")
 
+	// ErrKeyWeak: key is one of the 8 small-order Ed25519 encodings, or not a canonical point
+	// encoding (IsWeakKey). Encode and Decode both refuse it, with this one value, so no Go code
+	// path can hold a parsed certificate carrying such a key (contract, Roles are bound by key:
+	// refused "by clients and at the ceremony"). relayverify's ErrCertificateKeyWeak is an alias
+	// of it, not a second error.
+	ErrKeyWeak = errors.New("signingcert: the key is a small-order or non-canonical point")
+
 	// ErrSelfCertificate: key is the key whose Fingerprint is root -- a root certifying
 	// itself as a signing key. Refused here without the pinned roots (ruled 2026-10-15);
 	// verification's comparison against both pinned roots stays as well.

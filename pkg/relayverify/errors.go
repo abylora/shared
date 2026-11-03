@@ -2,7 +2,11 @@
 
 package relayverify
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/abylora/shared/pkg/signingcert"
+)
 
 // EVERY ERROR THIS PACKAGE RETURNS IS ONE OF THESE SENTINELS, BARE. Nothing wraps them, and none
 // carries a byte of the input: an error value is the easiest thing in the world to log, and a
@@ -63,11 +67,14 @@ var (
 	ErrCertificateKeyIsRoot = errors.New("relayverify: the signing certificate's key is a pinned root")
 
 	// ErrCertificateKeyWeak: the certificate's key is one of the 8 small-order Ed25519 encodings,
-	// or not a canonical point encoding (contract, Roles are bound by key). crypto/ed25519
-	// accepts a signature by the identity key over any message, so a certified small-order key
-	// would let anyone sign lists. This checks the certified key; it does not change the
-	// verification rule.
-	ErrCertificateKeyWeak = errors.New("relayverify: the signing certificate's key is a weak point")
+	// or not a canonical point encoding (contract, Roles are bound by key). crypto/ed25519 accepts
+	// a signature by the identity key over any message, so a certified small-order key would let
+	// anyone sign lists. This checks the certified key; it does not change the verification rule.
+	//
+	// AN ALIAS of signingcert.ErrKeyWeak, not a second error: one value, so errors.Is and == match
+	// whichever layer caught the weak key. Its text is therefore signingcert's -- the one sentinel
+	// of this package that does not start "relayverify: ", on purpose.
+	ErrCertificateKeyWeak = signingcert.ErrKeyWeak
 
 	// ErrListProofMissing: no list proof. A list arriving without a valid proof is invalid,
 	// exactly as an unsigned one is (contract, Rules).
