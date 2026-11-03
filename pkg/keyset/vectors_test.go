@@ -42,6 +42,7 @@ var violationWords = map[error]keysetvectors.Violation{
 	keyset.ErrDeltaVersionsNotIncreasing: keysetvectors.ViolationDeltaVersionsNotIncreasing,
 	keyset.ErrDeltaGap:                   keysetvectors.ViolationDeltaGap,
 	keyset.ErrHeartbeatBelowCursor:       keysetvectors.ViolationHeartbeatBelowCursor,
+	keyset.ErrHeartbeatAboveCursor:       keysetvectors.ViolationHeartbeatAboveCursor,
 }
 
 func runFile(t *testing.T, name string) {

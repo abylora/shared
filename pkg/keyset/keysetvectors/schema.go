@@ -55,6 +55,7 @@ const (
 	ViolationDeltaVersionsNotIncreasing Violation = "delta_versions_not_increasing"
 	ViolationDeltaGap                   Violation = "delta_gap"
 	ViolationHeartbeatBelowCursor       Violation = "heartbeat_below_cursor"
+	ViolationHeartbeatAboveCursor       Violation = "heartbeat_above_cursor"
 )
 
 // The node direction's violations (rule 16).
@@ -71,7 +72,7 @@ var consumerViolations = map[Violation]bool{
 	ViolationSnapshotBeginVersionZero: true, ViolationSnapshotNested: true, ViolationSnapshotEndWithoutBegin: true,
 	ViolationSnapshotEndVersionMismatch: true, ViolationUpsertOutsideSnapshot: true, ViolationDeltaInsideSnapshot: true,
 	ViolationHeartbeatInsideSnapshot: true, ViolationDeltaFromVersionZero: true, ViolationDeltaVersionsNotIncreasing: true,
-	ViolationDeltaGap: true, ViolationHeartbeatBelowCursor: true,
+	ViolationDeltaGap: true, ViolationHeartbeatBelowCursor: true, ViolationHeartbeatAboveCursor: true,
 }
 
 var nodeViolations = map[Violation]bool{

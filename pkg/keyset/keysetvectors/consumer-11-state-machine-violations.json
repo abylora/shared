@@ -608,6 +608,118 @@
       }
     },
     {
+      "id": "11-a-heartbeat-above-the-cursor",
+      "description": "A Heartbeat whose current_version is above the cursor is a violation (rules 6 and 13): every version up to it was delivered before it, so the node reconnects at once, with no timer; the cursor and set are unchanged.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "4242",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "4242"
+          }
+        },
+        {
+          "receive": {
+            "heartbeat": {
+              "current_version": "4300"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "heartbeat_above_cursor"
+          }
+        },
+        {
+          "hello": {
+            "held_version": "4242"
+          }
+        }
+      ],
+      "final": {
+        "cursor": "4242",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "11-a-stream-resumed-at-the-published-version-carries-exactly-the-held-version",
+      "description": "On a stream that resumed at the published version and has delivered nothing, the heartbeat ceiling is the resumed held_version (rule 6): a Heartbeat of exactly it changes nothing, and one a single version above it is a violation.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "4242",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "4242"
+          }
+        },
+        {
+          "receive": {
+            "heartbeat": {
+              "current_version": "4242"
+            }
+          },
+          "expect": {
+            "outcome": "unchanged"
+          }
+        },
+        {
+          "receive": {
+            "heartbeat": {
+              "current_version": "4243"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "heartbeat_above_cursor"
+          }
+        },
+        {
+          "hello": {
+            "held_version": "4242"
+          }
+        }
+      ],
+      "final": {
+        "cursor": "4242",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
       "id": "11-a-message-with-no-arm",
       "description": "A message with no arm is a violation; the cursor and set are unchanged.",
       "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
@@ -1138,8 +1250,8 @@
       }
     },
     {
-      "id": "11-a-heartbeat-at-or-above-the-cursor-is-legal",
-      "description": "A Heartbeat at or above the cursor changes nothing; acting on a cursor behind current_version is a timer's job.",
+      "id": "11-a-heartbeat-at-the-cursor-is-legal",
+      "description": "A Heartbeat whose current_version equals the cursor changes nothing and sends nothing.",
       "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "initial": {
         "cursor": "4242",
@@ -1162,16 +1274,6 @@
           "receive": {
             "heartbeat": {
               "current_version": "4242"
-            }
-          },
-          "expect": {
-            "outcome": "unchanged"
-          }
-        },
-        {
-          "receive": {
-            "heartbeat": {
-              "current_version": "4300"
             }
           },
           "expect": {
