@@ -1,0 +1,111 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "1",
+    "5"
+  ],
+  "cases": [
+    {
+      "id": "11b1-a-snapshot-equal-to-the-held-set-is-reported",
+      "description": "A snapshot equal to the held set advances the cursor to its version and is reported, though nothing on the interface changes.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "54000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "54000"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "54060"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "54060"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "54060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "54060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

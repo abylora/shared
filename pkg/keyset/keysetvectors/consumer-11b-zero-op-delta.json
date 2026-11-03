@@ -1,0 +1,60 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "5"
+  ],
+  "cases": [
+    {
+      "id": "11b-a-zero-op-delta-advances-the-cursor-and-is-reported",
+      "description": "A Delta with no ops advances the cursor and is reported in Applied.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "52000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "52000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "52000",
+              "to_version": "52060",
+              "ops": []
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "52060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "52060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

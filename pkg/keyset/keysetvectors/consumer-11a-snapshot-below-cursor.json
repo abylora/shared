@@ -1,0 +1,158 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "3",
+    "13"
+  ],
+  "cases": [
+    {
+      "id": "11a-a-snapshot-below-the-cursor-is-applied",
+      "description": "A snapshot whose version is below the cursor, the answer to a held_version above the published version, is applied and moves the cursor down.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "50000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "50000"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "30000"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "30000"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "30000",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "30000",
+        "set": [
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "11a-a-snapshot-at-the-cursor-is-applied",
+      "description": "A snapshot whose version equals the cursor, the answer to a held_version equal to the published version against an empty log, replaces the set and is reported.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "50000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "50000"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "50000"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "50000"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "50000",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "50000",
+        "set": [
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

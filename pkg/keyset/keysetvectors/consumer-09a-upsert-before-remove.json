@@ -1,0 +1,70 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "10",
+    "12"
+  ],
+  "cases": [
+    {
+      "id": "09a-an-upsert-before-the-remove-that-frees-its-address-is-skipped",
+      "description": "Upsert(new) then Remove(old) for one address skips the Upsert deterministically: ops apply in received order, so the address is still held when the Upsert arrives.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "70000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "70000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "70000",
+              "to_version": "70060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "remove": {
+                    "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "70060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "70060",
+        "set": [],
+        "skipped": "1"
+      }
+    }
+  ]
+}

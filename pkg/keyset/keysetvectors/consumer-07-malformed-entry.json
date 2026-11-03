@@ -1,0 +1,1994 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "11"
+  ],
+  "cases": [
+    {
+      "id": "07-a-key-of-31-bytes-is-skipped",
+      "description": "A key of 31 bytes is skipped: no held entry has its key, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "22222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-key-of-33-bytes-is-skipped",
+      "description": "A key of 33 bytes is skipped: no held entry has its key, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "222222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-an-empty-key-is-skipped",
+      "description": "An empty key is skipped: no held entry has its key, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-the-nodes-own-key-is-skipped",
+      "description": "The node's own interface key is skipped: no held entry has its key, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip-above-the-pool-is-skipped",
+      "description": "A tunnel_ip of 10.128.0.1, above the pool is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a800001",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip-below-the-pool-is-skipped",
+      "description": "A tunnel_ip of 10.63.255.255, below the pool is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a3fffff",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip-outside-10-slash-8-is-skipped",
+      "description": "A tunnel_ip of 11.64.0.1, outside 10.0.0.0/8 is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0b400001",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip-in-the-reserved-slash-24-is-skipped",
+      "description": "A tunnel_ip of 10.64.0.5, inside the reserved 10.64.0.0/24 is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400005",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-the-top-of-the-reserved-slash-24-is-skipped",
+      "description": "A tunnel_ip of 10.64.0.255, the top of the reserved 10.64.0.0/24 is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a4000ff",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip-of-3-bytes-is-skipped",
+      "description": "A tunnel_ip of 3 bytes is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a4001",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip-of-5-bytes-is-skipped",
+      "description": "A tunnel_ip of 5 bytes is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a40010500",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-an-ipv4-mapped-16-byte-tunnel-ip-is-skipped",
+      "description": "An IPv4-mapped tunnel_ip of 16 bytes is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "00000000000000000000ffff0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-an-empty-tunnel-ip-is-skipped",
+      "description": "An empty tunnel_ip is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip6-of-1-byte-is-skipped",
+      "description": "A tunnel_ip6 of 1 byte is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "fd",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip6-of-4-bytes-is-skipped",
+      "description": "A tunnel_ip6 of 4 bytes is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "0a400105",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip6-of-15-bytes-is-skipped",
+      "description": "A tunnel_ip6 of 15 bytes is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "fd0000000000000000000000000000",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip6-of-17-bytes-is-skipped",
+      "description": "A tunnel_ip6 of 17 bytes is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "fd00000000000000000000000000000100",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-valid-until-one-second-past-midnight-is-skipped",
+      "description": "A valid_until one second past midnight is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761601"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-valid-until-at-noon-is-skipped",
+      "description": "A valid_until at noon is skipped: the held entry under its key is removed, the rest of the Delta applies and the gauge counts it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798804800"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-malformed-entry-in-a-snapshot-is-skipped",
+      "description": "A malformed entry inside a snapshot is skipped and counted; the rest of the snapshot applies.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "61120"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a800001",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "61120"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61120",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61120",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "07-a-tunnel-ip6-of-16-bytes-is-kept",
+      "description": "A tunnel_ip6 of 16 bytes is kept: its entry replaces the held one, the rest of the Delta applies and nothing is counted.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400103",
+                      "tunnel_ip6": "fd000000000000000000000000000001",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "fd000000000000000000000000000001",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "07-the-first-address-above-the-reserved-slash-24-is-kept",
+      "description": "A tunnel_ip of 10.64.1.0, the first address above the reserved 10.64.0.0/24 is kept: its entry replaces the held one, the rest of the Delta applies and nothing is counted.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400100",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400100",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "07-the-top-of-the-pool-is-kept",
+      "description": "A tunnel_ip of 10.127.255.255, the top of the pool is kept: its entry replaces the held one, the rest of the Delta applies and nothing is counted.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "61000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "61000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "61000",
+              "to_version": "61060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a7fffff",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "61060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "61060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a7fffff",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

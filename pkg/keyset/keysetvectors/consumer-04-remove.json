@@ -1,0 +1,116 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "2"
+  ],
+  "cases": [
+    {
+      "id": "04-a-remove-of-a-held-key-removes-it",
+      "description": "A Remove of a held key removes its entry.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "12000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "12000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "12000",
+              "to_version": "12060",
+              "ops": [
+                {
+                  "remove": {
+                    "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "12060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "12060",
+        "set": [],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "04-a-remove-of-an-unknown-key-is-a-no-op",
+      "description": "A Remove of a key the node does not hold changes nothing, and the cursor still advances.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "12000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "12000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "12000",
+              "to_version": "12060",
+              "ops": [
+                {
+                  "remove": {
+                    "public_key": "3333333333333333333333333333333333333333333333333333333333333333"
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "12060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "12060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

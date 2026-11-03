@@ -1,0 +1,105 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "2",
+    "12"
+  ],
+  "cases": [
+    {
+      "id": "05-an-upsert-changing-a-tunnel-address-replaces-the-entry",
+      "description": "An Upsert moving a key to a new address replaces its entry and frees the old address, which the next Delta gives to another key.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "15500",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "15500"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "15500",
+              "to_version": "15560",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                      "tunnel_ip": "0a400103",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "15560",
+              "skipped": "0"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "15560",
+              "to_version": "15620",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "15620",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "15620",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

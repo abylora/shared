@@ -1,0 +1,44 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "producer.resume",
+  "rules": [
+    "3"
+  ],
+  "cases": [
+    {
+      "id": "12-a-held-version-above-published-gets-a-snapshot",
+      "description": "A held_version above the published version gets a snapshot.",
+      "held_version": "99000",
+      "log": [
+        {
+          "from_version": "94000",
+          "to_version": "95000"
+        },
+        {
+          "from_version": "95000",
+          "to_version": "96000"
+        },
+        {
+          "from_version": "96000",
+          "to_version": "97000"
+        }
+      ],
+      "published": "97000",
+      "expect": {
+        "send": "snapshot",
+        "snapshot_version": "97000"
+      }
+    },
+    {
+      "id": "12-a-held-version-above-published-with-an-empty-log-gets-a-snapshot",
+      "description": "With an empty log, a held_version above published still gets a snapshot.",
+      "held_version": "99000",
+      "log": [],
+      "published": "97000",
+      "expect": {
+        "send": "snapshot",
+        "snapshot_version": "97000"
+      }
+    }
+  ]
+}

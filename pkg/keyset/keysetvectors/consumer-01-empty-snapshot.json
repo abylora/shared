@@ -1,0 +1,67 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "1"
+  ],
+  "cases": [
+    {
+      "id": "01-an-empty-snapshot-empties-the-held-set",
+      "description": "An empty snapshot over a held set of two entries leaves the set empty and the cursor at the snapshot's version: an empty snapshot means the set is empty, never no change.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "3",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "3"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "5"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "5"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "5",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "5",
+        "set": [],
+        "skipped": "0"
+      }
+    }
+  ]
+}

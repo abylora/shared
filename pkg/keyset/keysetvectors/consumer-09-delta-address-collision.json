@@ -1,0 +1,337 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "10",
+    "12"
+  ],
+  "cases": [
+    {
+      "id": "09-an-upsert-claiming-another-keys-address-is-skipped",
+      "description": "An Upsert claiming an address held by a different key is skipped and counted; the holder keeps it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "70000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "70000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "70000",
+              "to_version": "70060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "70060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "70060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "09-a-skipped-upsert-removes-its-keys-held-entry",
+      "description": "A key whose Upsert is skipped for claiming another key's address loses the entry it already held.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "70000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "70000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "70000",
+              "to_version": "70060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "70060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "70060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "09-remove-then-upsert-in-one-delta-reuses-the-address",
+      "description": "Remove(old) then Upsert(new) in one Delta hands the freed address to the new key, which proves in-order application.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "70000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "70000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "70000",
+              "to_version": "70060",
+              "ops": [
+                {
+                  "remove": {
+                    "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+                  }
+                },
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "70060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "70060",
+        "set": [
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "09-an-upsert-sharing-only-a-held-tunnel-ip6-is-kept",
+      "description": "The consumer checks tunnel_ip only: an Upsert sharing a held entry's 16-byte tunnel_ip6, at a free tunnel_ip, is applied and nothing is counted.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "70000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "fd000000000000000000000000000001",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "70000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "70000",
+              "to_version": "70060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400103",
+                      "tunnel_ip6": "fd000000000000000000000000000001",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "70060",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "70060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "fd000000000000000000000000000001",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "fd000000000000000000000000000001",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "09-a-malformed-upsert-at-a-held-address-leaves-the-holder-untouched",
+      "description": "Rule 11 applies first: an Upsert with a 31-byte key at a held entry's address is refused and counted, and the held entry is untouched.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "70000",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "70000"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "70000",
+              "to_version": "70060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "22222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "70060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "70060",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    }
+  ]
+}

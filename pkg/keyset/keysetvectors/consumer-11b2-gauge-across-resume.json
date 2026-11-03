@@ -1,0 +1,709 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "consumer",
+  "rules": [
+    "11"
+  ],
+  "cases": [
+    {
+      "id": "11b2-the-gauge-survives-a-resume-and-a-remove-clears-it",
+      "description": "A refusal from a snapshot is still counted after a resume by a Delta that does not mention it, and a Remove of the key clears it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "0",
+        "set": []
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "0"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "8100"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761601"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "8100"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8100",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "hello": {
+            "held_version": "8100"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8100",
+              "to_version": "8160",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8160",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8160",
+              "to_version": "8220",
+              "ops": [
+                {
+                  "remove": {
+                    "public_key": "2222222222222222222222222222222222222222222222222222222222222222"
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8220",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "8220",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "11b2-the-gauge-survives-a-resume-and-a-valid-upsert-clears-it",
+      "description": "A refusal from a snapshot is still counted after a resume, and a later valid Upsert of the key clears it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "0",
+        "set": []
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "0"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "8100"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761601"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "8100"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8100",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "hello": {
+            "held_version": "8100"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8100",
+              "to_version": "8160",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+                      "tunnel_ip": "0a400104",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8160",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8160",
+              "to_version": "8220",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400103",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8220",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "8220",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400103",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          },
+          {
+            "public_key": "3333333333333333333333333333333333333333333333333333333333333333",
+            "tunnel_ip": "0a400104",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "11b2-a-new-snapshot-replaces-the-refused-keys",
+      "description": "A snapshot replaces the whole set, refusals included (rule 1): a key refused by the previous snapshot and absent from the new one no longer counts.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "0",
+        "set": []
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "0"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "8100"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                "tunnel_ip": "0a400103",
+                "tunnel_ip6": "",
+                "valid_until": "1798761601"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "8100"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8100",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "snapshot_begin": {
+              "version": "8200"
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          },
+          "expect": {
+            "outcome": "accumulating"
+          }
+        },
+        {
+          "receive": {
+            "snapshot_end": {
+              "version": "8200"
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8200",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "8200",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "11b2-a-key-refused-twice-counts-once",
+      "description": "The gauge counts keys, not refusals: a key refused by two Deltas in a row, for two different defects, counts once.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "8100",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "8100"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8100",
+              "to_version": "8160",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400103",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761601"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8160",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8160",
+              "to_version": "8220",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a800001",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8220",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "8220",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "1"
+      }
+    },
+    {
+      "id": "11b2-a-remove-of-a-refused-31-byte-key-clears-it",
+      "description": "Refusals are held by the key's raw bytes, so a refused 31-byte key is cleared by a Remove of the same 31 bytes.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "8100",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "8100"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8100",
+              "to_version": "8160",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "22222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400105",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8160",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8160",
+              "to_version": "8220",
+              "ops": [
+                {
+                  "remove": {
+                    "public_key": "22222222222222222222222222222222222222222222222222222222222222"
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8220",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "8220",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    },
+    {
+      "id": "11b2-a-key-refused-for-a-collision-is-cleared-by-a-later-valid-upsert",
+      "description": "A key refused for claiming a held address stays counted until a later Upsert of it is valid and unclaimed, which clears it.",
+      "own_public_key": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "initial": {
+        "cursor": "8100",
+        "set": [
+          {
+            "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ]
+      },
+      "steps": [
+        {
+          "hello": {
+            "held_version": "8100"
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8100",
+              "to_version": "8160",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8160",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8160",
+              "to_version": "8220",
+              "ops": [
+                {
+                  "remove": {
+                    "public_key": "1111111111111111111111111111111111111111111111111111111111111111"
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8220",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "receive": {
+            "delta": {
+              "from_version": "8220",
+              "to_version": "8280",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400102",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "expect": {
+            "outcome": "applied",
+            "applied": {
+              "version": "8280",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "final": {
+        "cursor": "8280",
+        "set": [
+          {
+            "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+            "tunnel_ip": "0a400102",
+            "tunnel_ip6": "",
+            "valid_until": "1798761600"
+          }
+        ],
+        "skipped": "0"
+      }
+    }
+  ]
+}

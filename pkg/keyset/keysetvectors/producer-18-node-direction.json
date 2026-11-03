@@ -1,0 +1,615 @@
+{
+  "schema": "abylora.keyset.vectors.v1",
+  "kind": "producer.node_direction",
+  "rules": [
+    "16"
+  ],
+  "cases": [
+    {
+      "id": "18-hello-then-applied-of-each-delivered-version-in-non-decreasing-order-is-legal",
+      "description": "A Hello, then an Applied of each version delivered on the stream, in non-decreasing order, is recorded in full.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "0"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_begin": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_end": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "120000",
+              "skipped": "0"
+            }
+          }
+        },
+        {
+          "sent": {
+            "delta": {
+              "from_version": "120000",
+              "to_version": "120060",
+              "ops": [
+                {
+                  "upsert": {
+                    "entry": {
+                      "public_key": "2222222222222222222222222222222222222222222222222222222222222222",
+                      "tunnel_ip": "0a400103",
+                      "tunnel_ip6": "",
+                      "valid_until": "1798761600"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120060",
+              "skipped": "1"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "120060",
+              "skipped": "1"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120060",
+              "skipped": "1"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "120060",
+              "skipped": "1"
+            }
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "0"
+        },
+        {
+          "applied_version": "120000",
+          "skipped": "0"
+        },
+        {
+          "applied_version": "120060",
+          "skipped": "1"
+        },
+        {
+          "applied_version": "120060",
+          "skipped": "1"
+        }
+      ]
+    },
+    {
+      "id": "18-a-node-message-with-no-arm-closes-the-stream",
+      "description": "A node message with no arm closes the stream; the Hello already recorded stands.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "116000"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "116000"
+            }
+          }
+        },
+        {
+          "received": {},
+          "expect": {
+            "outcome": "violation",
+            "violation": "node_message_no_arm"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "116000"
+        }
+      ]
+    },
+    {
+      "id": "18-a-node-message-with-an-unknown-arm-closes-the-stream",
+      "description": "A node message with an unknown arm closes the stream.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "116000"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "116000"
+            }
+          }
+        },
+        {
+          "received": {
+            "wire": "1a00"
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "node_message_no_arm"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "116000"
+        }
+      ]
+    },
+    {
+      "id": "18-an-applied-before-the-hello-closes-the-stream",
+      "description": "An Applied as the first message closes the stream and records nothing. (It also names an undelivered version; the order of checks makes applied_before_hello the reason.)",
+      "steps": [
+        {
+          "received": {
+            "applied": {
+              "version": "118000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "applied_before_hello"
+          }
+        }
+      ],
+      "records": []
+    },
+    {
+      "id": "18-a-second-hello-closes-the-stream-and-the-first-stands",
+      "description": "A second Hello closes the stream, and the first Hello's record stands, so a rebooted node never reads as holding its stale version.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "117000"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "117000"
+            }
+          }
+        },
+        {
+          "received": {
+            "hello": {
+              "held_version": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "hello_repeated"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "117000"
+        }
+      ]
+    },
+    {
+      "id": "18-an-applied-of-an-undelivered-version-closes-the-stream-and-nothing-after-is-recorded",
+      "description": "An Applied naming a version not delivered on this stream closes it, and nothing after it is recorded.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "0"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_begin": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_end": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120060",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "applied_not_delivered"
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "closed"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "0"
+        }
+      ]
+    },
+    {
+      "id": "18-the-hellos-own-held-version-is-not-delivered",
+      "description": "A node cannot report its held version as applied: it was not delivered on this stream.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "115000"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "115000"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "115000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "applied_not_delivered"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "115000"
+        }
+      ]
+    },
+    {
+      "id": "18-a-heartbeats-version-is-not-delivered",
+      "description": "A Heartbeat delivers no set, so an Applied of its current_version names an undelivered version.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "116000"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "116000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "heartbeat": {
+              "current_version": "116000"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "116000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "applied_not_delivered"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "116000"
+        }
+      ]
+    },
+    {
+      "id": "18-a-snapshot-that-has-not-ended-is-not-delivered",
+      "description": "A SnapshotBegin delivers no set until its SnapshotEnd, so an Applied of its version before the end names an undelivered version.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "0"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_begin": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "applied_not_delivered"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "0"
+        }
+      ]
+    },
+    {
+      "id": "18-an-applied-below-the-hellos-held-version-is-legal",
+      "description": "No lower compares with the previous Applied only, never with the Hello: a node holding a version above the published one applies the lower snapshot and reports it.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "125000"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "125000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_begin": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "upsert": {
+              "entry": {
+                "public_key": "1111111111111111111111111111111111111111111111111111111111111111",
+                "tunnel_ip": "0a400102",
+                "tunnel_ip6": "",
+                "valid_until": "1798761600"
+              }
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_end": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "120000",
+              "skipped": "0"
+            }
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "125000"
+        },
+        {
+          "applied_version": "120000",
+          "skipped": "0"
+        }
+      ]
+    },
+    {
+      "id": "18-an-applied-below-the-previous-closes-the-stream",
+      "description": "An Applied lower than the previous Applied closes the stream; the records before it stand.",
+      "steps": [
+        {
+          "received": {
+            "hello": {
+              "held_version": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "0"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_begin": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "sent": {
+            "snapshot_end": {
+              "version": "120000"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "120000",
+              "skipped": "0"
+            }
+          }
+        },
+        {
+          "sent": {
+            "delta": {
+              "from_version": "120000",
+              "to_version": "120060",
+              "ops": []
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120060",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "record",
+            "record": {
+              "applied_version": "120060",
+              "skipped": "0"
+            }
+          }
+        },
+        {
+          "received": {
+            "applied": {
+              "version": "120000",
+              "skipped": "0"
+            }
+          },
+          "expect": {
+            "outcome": "violation",
+            "violation": "applied_decreasing"
+          }
+        }
+      ],
+      "records": [
+        {
+          "applied_version": "0"
+        },
+        {
+          "applied_version": "120000",
+          "skipped": "0"
+        },
+        {
+          "applied_version": "120060",
+          "skipped": "0"
+        }
+      ]
+    }
+  ]
+}
