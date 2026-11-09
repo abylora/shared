@@ -46,8 +46,8 @@ var (
 	// that one digit. 1.0, 1e0 and "1" are refused.
 	ErrSpecVersionUnsupported = errors.New("signingcert: spec_version is not 1")
 
-	// ErrEnvUnknown: env is neither production nor staging.
-	ErrEnvUnknown = errors.New("signingcert: env is neither production nor staging")
+	// ErrEnvUnknown: env is neither prod nor staging.
+	ErrEnvUnknown = errors.New("signingcert: env is neither prod nor staging")
 
 	// ErrRootMalformed: root is not standard, padded base64 of exactly 32 bytes, in its one
 	// canonical spelling.

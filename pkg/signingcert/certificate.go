@@ -19,15 +19,17 @@ const SpecVersion = 1
 
 // Env says which trust domain a certificate belongs to. Staging has its own roots and its own
 // log policy; env makes a staging certificate identifiable even if a log is ever shared.
+// The values are D24's environment names, spelled as the glossary spells them: "production"
+// is never a value. WIRE CONTRACT.
 type Env string
 
 const (
-	EnvProduction Env = "production"
-	EnvStaging    Env = "staging"
+	EnvProd    Env = "prod"
+	EnvStaging Env = "staging"
 )
 
 // Valid reports whether e is one of the two environments.
-func (e Env) Valid() bool { return e == EnvProduction || e == EnvStaging }
+func (e Env) Valid() bool { return e == EnvProd || e == EnvStaging }
 
 // Certificate is one decoded signing certificate. Decoding it verifies nothing: it is the
 // root's statement, and whether the root made it is the signature's question, not this type's.
