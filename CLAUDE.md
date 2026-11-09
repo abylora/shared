@@ -11,9 +11,12 @@ A Go module of code that more than one service must agree on (D26):
   (`pkg/signingcert`) and its client-side verifier (`pkg/relayverify`);
 - the key set stream's wire types (`pkg/keyset/keysetpb`, generated from `proto/`);
 - the key set's reference applier and delta vectors (`pkg/keyset`,
-  `pkg/keyset/keysetvectors`).
+  `pkg/keyset/keysetvectors`);
+- the ceremony's certificate writer (`cmd/signing-certificate`), which builds the
+  signing certificate only through `signingcert.Encode`.
 
-It is a **library, not a service**: nothing runs it on its own.
+It is a **library, not a service**: nothing runs it on its own, except that one ceremony
+command.
 
 It exists because a transport is a *protocol* between the node and the client, not a
 utility. If each side grew its own Shadowsocks or QUIC implementation they would drift,
