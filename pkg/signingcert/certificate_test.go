@@ -63,8 +63,8 @@ func TestTheConstantsAreTheContractValues(t *testing.T) {
 	if SpecVersion != 1 {
 		t.Errorf("SpecVersion = %d", SpecVersion)
 	}
-	if EnvProduction != "production" || EnvStaging != "staging" {
-		t.Errorf("EnvProduction = %q, EnvStaging = %q", EnvProduction, EnvStaging)
+	if EnvProd != "prod" || EnvStaging != "staging" {
+		t.Errorf("EnvProd = %q, EnvStaging = %q", EnvProd, EnvStaging)
 	}
 }
 
@@ -159,7 +159,9 @@ func TestEncodeRefuses(t *testing.T) {
 	}{
 		"an env outside the two values": {func(o *Opts) { o.Env = "Production" }, ErrEnvUnknown},
 		"an empty env":                  {func(o *Opts) { o.Env = "" }, ErrEnvUnknown},
-		"a root that is not base64":     {func(o *Opts) { o.Root = "not a fingerprint" }, ErrRootMalformed},
+		// D24 names the environments prod and staging; production is never a value.
+		"production, which D24 never names": {func(o *Opts) { o.Env = "production" }, ErrEnvUnknown},
+		"a root that is not base64":         {func(o *Opts) { o.Root = "not a fingerprint" }, ErrRootMalformed},
 		"a root that is not 32 bytes": {
 			func(o *Opts) { o.Root = "BuP9j9opu2CrWVV95h7bCuzbIxE0vjDnW0Vfjht5L6k" }, ErrRootMalformed,
 		},
@@ -208,7 +210,7 @@ func TestEncodeRefuses(t *testing.T) {
 
 func TestDecodeOfEncodeIsTheOpts(t *testing.T) {
 	want := vectorCOpts(t)
-	want.Env = EnvProduction
+	want.Env = EnvProd
 	want.Key = [32]byte(bytes.Repeat([]byte{0x07}, 32))
 
 	octets, err := Encode(want)
@@ -274,10 +276,10 @@ func TestDecodeRefuses(t *testing.T) {
 		// Duplicate keys, at any depth. encoding/json keeps the last occurrence; other
 		// languages keep the first, which is exactly a parser differential.
 		{"a duplicate top-level key", func(t *testing.T) string {
-			return replaceOnce(t, envField, envField+`,"env":"production"`)
+			return replaceOnce(t, envField, envField+`,"env":"prod"`)
 		}, ErrDuplicateKey},
 		{"a duplicate key spelled with an escape", func(t *testing.T) string {
-			return replaceOnce(t, envField, envField+`,"env":"production"`)
+			return replaceOnce(t, envField, envField+`,"\u0065nv":"prod"`)
 		}, ErrDuplicateKey},
 		{"a duplicate key in a nested object", func(t *testing.T) string {
 			return replaceOnce(t, envField, envField+`,"x":[{"a":1,"a":2}]`)
@@ -342,6 +344,9 @@ func TestDecodeRefuses(t *testing.T) {
 			return replaceOnce(t, envField, `"env":"Staging"`)
 		}, ErrEnvUnknown},
 		{"a null env", func(t *testing.T) string { return replaceOnce(t, envField, `"env":null`) }, ErrEnvUnknown},
+		{"production, which D24 never names", func(t *testing.T) string {
+			return replaceOnce(t, envField, `"env":"production"`)
+		}, ErrEnvUnknown},
 
 		// root: standard padded base64 of exactly 32 bytes.
 		{"a root without padding", func(t *testing.T) string {

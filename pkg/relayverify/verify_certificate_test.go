@@ -41,7 +41,7 @@ func TestACertificateSignedByNoPinnedRootIsRefused(t *testing.T) {
 
 func TestACertificateWhoseOctetsWereAlteredIsRefused(t *testing.T) {
 	b := baseBundle(t)
-	b.SigningCertificate = bytes.Replace(b.SigningCertificate, []byte(`"staging"`), []byte(`"production"`), 1)
+	b.SigningCertificate = bytes.Replace(b.SigningCertificate, []byte(`"staging"`), []byte(`"prod"`), 1)
 	requireRefused(t, b, ErrCertificateSignatureInvalid)
 }
 
